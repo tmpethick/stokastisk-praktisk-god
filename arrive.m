@@ -1,4 +1,4 @@
-function [lists, t] = arrive(lists, D, P, currentTime)    
+function lists = arrive(lists, D, P, currentTime)    
 %% Generate departure event or add to queue
 
     if sum(lists.servers.occupied) < length(lists.servers.occupied)
@@ -19,7 +19,7 @@ function [lists, t] = arrive(lists, D, P, currentTime)
     end
     
 %% Generate arrival event
-    event.type = 'Arrive';
+    event.type = 'Arrival';
     t = arrivalTime(D.aDist, P);
     event.timeStamp = currentTime + t;
     lists.events.addToEventList(event);

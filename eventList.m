@@ -16,12 +16,12 @@ classdef eventList < handle
         function obj = addToEventList(obj, event)
             %Finding index of last non-empty cell
             index = find(~cellfun('isempty',obj.list),1,'last');
-
+            
             % Adding to event list
             t = event.timeStamp;
             if (t < obj.list{index}.timeStamp)
 
-                for i=(obj.e+1):index
+                for i=obj.e:index
                     if (t < obj.list{i}.timeStamp)
                         obj.list(i+1:index+1) = obj.list(i:index); %heavy computational part
                         obj.list{i} = event;

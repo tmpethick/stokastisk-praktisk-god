@@ -25,6 +25,8 @@ classdef queueList < handle
         % Constructor
         function obj = queueList(maxLength)
             obj.list = cell(maxLength,1);
+            obj.head = 1;
+            obj.tail = 1;
         end
     end
     

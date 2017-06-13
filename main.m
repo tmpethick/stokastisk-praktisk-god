@@ -22,7 +22,7 @@ for i=1:1
     while (nextEvent.timeStamp < maxT)
         
         switch nextEvent.type
-            case 'Arrive'
+            case 'Arrival'
                 lists = arrive(lists, D, P, nextEvent.timeStamp);
             case 'Departure'
                 lists = depart(lists, nextEvent, D, P, nextEvent.timeStamp);
