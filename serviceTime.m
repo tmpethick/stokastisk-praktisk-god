@@ -1,3 +1,4 @@
+% Marcus kommentar
 function st = serviceTime(stDist, mu_s, pareto, constant)
 %% Generating
     %Simulating the service time process
