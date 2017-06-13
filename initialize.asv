@@ -1,0 +1,18 @@
+function [lists] = initialize(n, servers, events, ncoDist, mu_a, erlang_m)
+%% Creating max-size event list
+    list.events = eventList(n);
+    
+    
+%% Preparing first event
+
+    event.type = 'Normal Check-out';
+    event.timeStamp = 0;
+    eventList{1} = event;
+    lists.eventList = eventList;
+    
+%% Preparing servers availability
+    serverList = zeros(servers,1);  % 0 = available, 1 = serving
+    
+    lists.serverList = serverList;
+end
+

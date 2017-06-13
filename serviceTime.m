@@ -1,16 +1,16 @@
-function st = serviceTime(stDist, mu_s, pareto, constant)
+function st = serviceTime(sDist, P)
 %% Generating
     %Simulating the service time process
-    switch stDist
+    switch sDist
         case 'Exponential'
-            st = exprnd(mu_s);
+            st = exprnd(P.mu_s);
             
         case 'Constant'
-            st = constant;
+            st = P.constant;
             
         case 'Pareto'
             U = rand;
-            st = pareto(1)*U^(-1/pareto(2));
+            st = P.pareto(1)*U^(-1/P.pareto(2));
     end
 
 end

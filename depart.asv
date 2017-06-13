@@ -1,0 +1,12 @@
+function [lists] = depart(lists)
+%% Freeing up the server
+    lists.servers.list(lists.even
+%% Draw from queue
+    
+%% Generate departure event
+    event.type = 'Departure';
+    event.timeStamp = currentTime + t;
+    lists.events.addToEventList(event);
+    
+end
+

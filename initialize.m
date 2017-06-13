@@ -1,14 +1,17 @@
-function [eventList, serverList] = initialize(n, servers, events, dtDist, mu_a, erlang_m)
+function [lists] = initialize(n, servers, D, P)
 %% Creating max-size event list
-    eventList = cell(n*events,1);
+    lists.events = eventList(2*n);
+    
     
 %% Preparing first event
-    customer.event = 'Arrival';
-    customer.dt = arrivalTime(dtDist, mu_a, erlang_m);
-    customer.t = customer.dt;
-    eventList{1} = customer;
+    event.type = 'Arrive';
+    event.timeStamp = arrivalTime(D.aDist, P);
+    lists.events.list{1} = event;
     
 %% Preparing servers availability
-    serverList = zeros(servers,1);  % 0 = available, 1 = serving
+    lists.servers = serverList(servers);
+
+%% Preparing queue list
+    lists.queue = queueList(n);
 end
 

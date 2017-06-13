@@ -1,12 +1,12 @@
-function dt = arrivalTime(dtDist, mu_a, erlang_m)
+function dt = arrivalTime(aDist, P)
 %% Initializing
     %Simulating the arrival process
-    switch dtDist
+    switch aDist
         case 'Exponential'
-            dt = exprnd(mu_a); 
+            dt = exprnd(P.mu_a); 
             
         case 'Erlang'
-            dt = sum(exprnd(mu_a/erlang_m,1,erlang_m),2);
+            dt = sum(exprnd(P.mu_a/P.erlang,1,P.erlang),2);
             
         case 'HyperExponential'
             p = [0.8, 0.2];
