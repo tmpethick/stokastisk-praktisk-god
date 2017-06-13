@@ -6,7 +6,7 @@ function [eventList, serverList] = initialize(n, servers, events, dtDist, mu_a, 
     customer.event = 'Arrival';
     customer.dt = arrivalTime(dtDist, mu_a, erlang_m);
     customer.t = customer.dt;
-    
+    1+1
     eventList{1} = customer;
     
 %% Preparing servers availability
