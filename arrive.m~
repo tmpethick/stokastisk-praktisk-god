@@ -2,6 +2,7 @@ function [lists,block] = arrive(lists, D, P, currentTime, maxQueueLength)
 %% Generate departure event or add to queue
     
     block = 0;
+    if length(lists.queue) > maxQueueLength
     if sum(lists.servers.occupied) < length(lists.servers.occupied)
         %Occupy server
         index = find(lists.servers.occupied == 0);
@@ -16,7 +17,7 @@ function [lists,block] = arrive(lists, D, P, currentTime, maxQueueLength)
         lists.events.addToEventList(event);
     else
         customer.timeStamp = currentTime;
-        if lists.queue.tail-lists.queue.head >= maxQueueLength
+        if length(lists.queue) > maxQueueLength
             block = 1;
         else
         lists.queue.addToQueue(customer);

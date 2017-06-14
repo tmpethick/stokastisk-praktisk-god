@@ -1,7 +1,7 @@
 %% Using servicetime = exponential, betweentime = exponential
 
 maxPreSpace = 10000;
-maxQueueLength = 10;
+maxQueueLength = 0;
 servers = 10;
 D.aDist = 'Exponential';
 D.sDist = 'Exponential';
@@ -10,7 +10,7 @@ P.mu_s = 8; %mean service time
 P.erlang = 3;
 P.pareto = [1, 2.05];
 P.constant = 1;
-numExperiments = 10;
+numExperiments = 1;
 blockedCounts = zeros(numExperiments,1);
 eventCounts = zeros(numExperiments,1);
 customerCounts = zeros(numExperiments,1);

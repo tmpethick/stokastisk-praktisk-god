@@ -1,6 +1,6 @@
-function [lists] = initialize(n, servers, D, P)
+function [lists] = initialize(maxPreSpace, servers, D, P)
 %% Creating max-size event list
-    lists.events = eventList(2*n);
+    lists.events = eventList(2*maxPreSpace);
     
     
 %% Preparing first event
@@ -12,6 +12,6 @@ function [lists] = initialize(n, servers, D, P)
     lists.servers = serverList(servers);
 
 %% Preparing queue list
-    lists.queue = queueList(n);
+    lists.queue = queueList(maxPreSpace);
 end
 
