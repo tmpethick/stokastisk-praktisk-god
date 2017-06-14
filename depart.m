@@ -7,7 +7,7 @@ function [lists] = depart(lists, event, D, P, currentTime)
         %Occupy server
         index = find(lists.servers.occupied == 0);
         index = index(1);
-        lists.servers.setServer('Occupy', index) = 1;
+        lists.servers.setServer('Occupy', index);
         
         %Raise departure event
         t = serviceTime(D.sDist, P);

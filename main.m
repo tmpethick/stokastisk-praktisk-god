@@ -16,11 +16,13 @@ eventCounts = zeros(numExperiments,1);
 customerCounts = zeros(numExperiments,1);
 maxT = 60*14*12;
 burnInPeriod = 60*14;
+
 for i=1:numExperiments
     
     lists = initialize(maxPreSpace, servers, D, P);
     nextEvent = lists.events.next();
     
+    % Simulating discrete event
     while (nextEvent.timeStamp < maxT)
         
         switch nextEvent.type
@@ -28,6 +30,7 @@ for i=1:numExperiments
                 [lists,block] = arrive(lists, D, P, nextEvent.timeStamp,...
                     maxQueueLength);
                 
+                %Gathering statistical data
                 if nextEvent.timeStamp > burnInPeriod
                     customerCounts(i) = customerCounts(i) + 1;
                 else
@@ -37,6 +40,8 @@ for i=1:numExperiments
             case 'Departure'
                 lists = depart(lists, nextEvent, D, P, nextEvent.timeStamp);
         end
+        
+        %Saving statistical data
         blockedCounts(i) = blockedCounts(i) + block;
         block = 0;
         eventCounts(i) = eventCounts(i) + 1;
