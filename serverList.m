@@ -7,6 +7,7 @@ classdef serverList < handle
 
 %% Methods
     methods
+
         function obj = occupyServer(obj, serverIdx)
             obj.status(serverIdx) = ServerStatus.Occupied;
         end
@@ -25,9 +26,11 @@ classdef serverList < handle
         end
 
         % Constructor
-        function obj = serverList(n_s)
-            obj.status = zeros(n_s,1);
-            obj.type   = cell(n_s,1);
+        function obj = serverList(n_s,nSelfService)
+            obj.status    = zeros(n_s,1);
+            obj.type        = cell(n_s,1);
+            obj.type{1:nSelfService} = 'Self-Service';
+            obj.type{nSelfService+1:end} = 'Normal Service';
         end
     end
     

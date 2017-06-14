@@ -1,4 +1,4 @@
-function [lists] = initialize(maxPreSpace, numServers, arrivalDist, isCommonQueue)
+function [lists] = initialize(maxPreSpace, numServers, nSelfService, arrivalDist, isCommonQueue)
 %% Creating max-size event list
     lists.events = eventList(2*maxPreSpace);
     
@@ -9,8 +9,7 @@ function [lists] = initialize(maxPreSpace, numServers, arrivalDist, isCommonQueu
     lists.events.addToEventList(event);
     
 %% Preparing servers availability
-    lists.servers = serverList(numServers);
-
+    lists.servers = serverList(servers,nSelfService);
 %% Preparing queue list
     lists.queue = queueList(maxPreSpace, isCommonQueue, numServers);
 end
