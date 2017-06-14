@@ -1,26 +1,33 @@
 classdef serverList < handle
 %% Properties
     properties
-        occupied
+        status
         type
     end
-    
+
 %% Methods
     methods
-        function obj = setServer(obj, setAvailability, server)
-            switch setAvailability
-                case 'Occupy'
-                    obj.occupied(server) = 1;
-                case 'Free'
-                    obj.occupied(server) = 0;
-                otherwise
-                    error('Server availability incorrectly specified: Use bloody big letters')
-            end
+
+        function obj = occupyServer(obj, serverIdx)
+            obj.status(serverIdx) = ServerStatus.Occupied;
         end
         
+        function obj = freeServer(obj, serverIdx)
+            obj.status(serverIdx) = ServerStatus.Free;
+        end
+
+        function index = getFreeServer(obj)
+            indexes = find(obj.status == ServerStatus.Free);
+            index = indexes(1);
+        end
+
+        function has = hasFreeServer(obj)
+            has = sum(obj.status) < length(obj.status);
+        end
+
         % Constructor
         function obj = serverList(n_s,nSelfService)
-            obj.occupied    = zeros(n_s,1);
+            obj.status    = zeros(n_s,1);
             obj.type        = cell(n_s,1);
             obj.type{1:nSelfService} = 'Self-Service';
             obj.type{nSelfService+1:end} = 'Normal Service';
