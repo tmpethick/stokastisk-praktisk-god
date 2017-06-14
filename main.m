@@ -10,7 +10,7 @@ P.mu_s = 8; %mean service time
 P.erlang = 3;
 P.pareto = [1, 2.05];
 P.constant = 1;
-numExperiments = 10;
+numExperiments = 1;
 blockedCounts = zeros(numExperiments,1);
 eventCounts = zeros(numExperiments,1);
 customerCounts = zeros(numExperiments,1);
@@ -25,19 +25,17 @@ for i=1:numExperiments
     
     % Simulating discrete event
     while (nextEvent.timeStamp < maxT)
-        
         switch nextEvent.type
             case 'Arrival'
                 [lists,block] = arrive(lists, D, P, nextEvent.timeStamp,...
                     maxQueueLength);
-                
+
                 %Gathering statistical data
                 if nextEvent.timeStamp > burnInPeriod
                     customerCounts(i) = customerCounts(i) + 1;
                 else
                     block = 0;
-                end
-                
+                end                
             case 'Departure'
                 [lists,queueTime] = depart(lists, nextEvent, D, P, nextEvent.timeStamp);
         end
@@ -46,6 +44,7 @@ for i=1:numExperiments
         blockedCounts(i) = blockedCounts(i) + block;
         block = 0;
         eventCounts(i) = eventCounts(i) + 1;
+
         nextEvent = lists.events.next();
     end
     disp(i)
