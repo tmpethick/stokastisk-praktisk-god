@@ -1,7 +1,7 @@
 %% Using servicetime = exponential, betweentime = exponential
 
 maxPreSpace = 10000;
-maxQueueLength = 10;
+maxQueueLength = 0;
 servers = 10;
 D.aDist = 'Exponential';
 D.sDist = 'Exponential';
@@ -16,6 +16,7 @@ eventCounts = zeros(numExperiments,1);
 customerCounts = zeros(numExperiments,1);
 maxT = 60*14*12;
 burnInPeriod = 60*14;
+rng(1);
 
 for i=1:numExperiments
     
@@ -38,7 +39,7 @@ for i=1:numExperiments
                 end
                 
             case 'Departure'
-                lists = depart(lists, nextEvent, D, P, nextEvent.timeStamp);
+                [lists,queueTime] = depart(lists, nextEvent, D, P, nextEvent.timeStamp);
         end
         
         %Saving statistical data
@@ -49,3 +50,6 @@ for i=1:numExperiments
     end
     disp(i)
 end
+
+disp(blockedCounts./customerCounts)
+disp(mean(blockedCounts./customerCounts))

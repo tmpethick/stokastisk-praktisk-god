@@ -13,7 +13,7 @@ classdef queueList < handle
         end
         
         function customer = drawFromQueue(obj)            
-            customer = obj.list(obj.head);
+            customer = obj.list{obj.head};
             obj.head = obj.head + 1;
         end
         

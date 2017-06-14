@@ -18,7 +18,7 @@ function [lists,block] = arrive(lists, D, P, currentTime, maxQueueLength)
         if lists.queue.tail-lists.queue.head >= maxQueueLength
             block = 1;
         else
-        lists.queue.addToQueue(customer);
+            lists.queue.addToQueue(customer);
         end
     end
     
