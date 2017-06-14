@@ -16,6 +16,7 @@ eventCounts = zeros(numExperiments,1);
 customerCounts = zeros(numExperiments,1);
 maxT = 60*14*12;
 burnInPeriod = 60*14;
+rng(1);
 
 for i=1:numExperiments
     
@@ -36,7 +37,7 @@ for i=1:numExperiments
                     block = 0;
                 end                
             case 'Departure'
-                lists = depart(lists, nextEvent, serviceDist, arrivalDist, nextEvent.timeStamp);
+                [lists,queueTime] = depart(lists, nextEvent, serviceDist, arrivalDist, nextEvent.timeStamp);
         end
         
         %Saving statistical data
@@ -48,3 +49,6 @@ for i=1:numExperiments
     end
     disp(i)
 end
+
+disp(blockedCounts./customerCounts)
+disp(mean(blockedCounts./customerCounts))
