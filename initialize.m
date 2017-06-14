@@ -6,7 +6,7 @@ function [lists] = initialize(n, servers, D, P)
 %% Preparing first event
     event.type = 'Arrival';
     event.timeStamp = arrivalTime(D.aDist, P);
-    lists.events.list{1} = event;
+    lists.events.addToEventList(event);
     
 %% Preparing servers availability
     lists.servers = serverList(servers);

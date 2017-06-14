@@ -18,16 +18,17 @@ count = 0;
 for i=1:1
     lists = initialize(n, servers, D, P);
     nextEvent = lists.events.next();
-    
+    disp(nextEvent);
+
     while (nextEvent.timeStamp < maxT)
-        
         switch nextEvent.type
             case 'Arrival'
                 lists = arrive(lists, D, P, nextEvent.timeStamp);
+                disp("Arrival" + lists.events.heap.Count());
             case 'Departure'
                 lists = depart(lists, nextEvent, D, P, nextEvent.timeStamp);
+                disp("Departure" + lists.events.heap.Count());
         end
-    
         count = count + 1;
         nextEvent = lists.events.next();
     end
