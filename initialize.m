@@ -1,11 +1,11 @@
-function [lists] = initialize(maxPreSpace, servers, D, P)
+function [lists] = initialize(maxPreSpace, servers, serviceDist, arrivalDist)
 %% Creating max-size event list
     lists.events = eventList(2*maxPreSpace);
     
     
 %% Preparing first event
     event.type = 'Arrival';
-    event.timeStamp = arrivalTime(D.aDist, P);
+    event.timeStamp = arrivalDist();
     lists.events.addToEventList(event);
     
 %% Preparing servers availability

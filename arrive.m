@@ -1,4 +1,4 @@
-function [lists,block] = arrive(lists, D, P, currentTime, maxQueueLength)    
+function [lists,block] = arrive(lists, serviceDist, arrivalDist, currentTime, maxQueueLength)    
 %% Generate departure event or add to queue
     
     block = 0;
@@ -9,7 +9,7 @@ function [lists,block] = arrive(lists, D, P, currentTime, maxQueueLength)
         lists.servers.setServer('Occupy', index);
         
         %Raise departure event
-        t = serviceTime(D.sDist, P);
+        t = serviceDist();
         event = struct('type','Departure','timeStamp', currentTime + t);
         event.payload.server = index;       %Payload is associated data. Server index is used to free up server in departure events
         lists.events.addToEventList(event);
@@ -23,7 +23,7 @@ function [lists,block] = arrive(lists, D, P, currentTime, maxQueueLength)
     end
     
 %% Generate arrival event
-    t = arrivalTime(D.aDist, P);
+    t = arrivalDist();
     event = struct('type','Arrival','timeStamp', currentTime + t);
     lists.events.addToEventList(event);
 end

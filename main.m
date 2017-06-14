@@ -3,14 +3,14 @@
 maxPreSpace = 10000;
 maxQueueLength = 0;
 servers = 10;
-D.aDist = 'Exponential';
-D.sDist = 'Exponential';
-P.mu_a = 1; %mean time between customers
-P.mu_s = 8; %mean service time
-P.erlang = 3;
-P.pareto = [1, 2.05];
-P.constant = 1;
-numExperiments = 1;
+
+serviceDist = @() exprnd(8);            % mean service time
+% serviceDist = @() 1;                  % constant
+% serviceDist = @() 1*rand^(-1/2.05);   % pareto beta=1, k=2.05
+
+arrivalDist = @() exprnd(1);            % mean arrival time
+
+numExperiments = 10;
 blockedCounts = zeros(numExperiments,1);
 eventCounts = zeros(numExperiments,1);
 customerCounts = zeros(numExperiments,1);
@@ -19,14 +19,14 @@ burnInPeriod = 60*14;
 
 for i=1:numExperiments
     
-    lists = initialize(maxPreSpace, servers, D, P);
+    lists = initialize(maxPreSpace, servers, serviceDist, arrivalDist);
     nextEvent = lists.events.next();
     
     % Simulating discrete event
     while (nextEvent.timeStamp < maxT)
         switch nextEvent.type
             case 'Arrival'
-                [lists,block] = arrive(lists, D, P, nextEvent.timeStamp,...
+                [lists,block] = arrive(lists, serviceDist, arrivalDist, nextEvent.timeStamp,...
                     maxQueueLength);
 
                 %Gathering statistical data
@@ -36,7 +36,7 @@ for i=1:numExperiments
                     block = 0;
                 end                
             case 'Departure'
-                lists = depart(lists, nextEvent, D, P, nextEvent.timeStamp);
+                lists = depart(lists, nextEvent, serviceDist, arrivalDist, nextEvent.timeStamp);
         end
         
         %Saving statistical data
