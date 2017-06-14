@@ -12,8 +12,7 @@ classdef eventList < handle
             event = obj.eventMap(time);
             obj.eventMap.remove(time);
         end
-        
-        
+
         function obj = addToEventList(obj, event)
             time = event.timeStamp;
             assert(~obj.eventMap.isKey(time));

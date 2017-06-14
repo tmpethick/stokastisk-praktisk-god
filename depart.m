@@ -1,4 +1,4 @@
-function [lists,queueTime] = depart(lists, event, D, P, currentTime)
+function [lists,queueTime] = depart(lists, event, serviceDist, arrivalDist, currentTime)
 %% Freeing up the server
     lists.servers.setServer('Free', event.payload.server);
 %% Draw from queue
@@ -10,10 +10,9 @@ function [lists,queueTime] = depart(lists, event, D, P, currentTime)
         index = find(lists.servers.occupied == 0);
         index = index(1);
         lists.servers.setServer('Occupy', index);
-        
-        
+
         %Raise departure event
-        t = serviceTime(D.sDist, P);
+        t = serviceDist();
         event = struct('type','Departure','timeStamp', currentTime + t);
         event.payload.server = index;       %Payload is associated data. Server index is used to free up server in departure events
         lists.events.addToEventList(event);
