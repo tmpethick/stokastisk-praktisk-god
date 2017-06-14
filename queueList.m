@@ -4,29 +4,49 @@ classdef queueList < handle
         list %list
         head %leading index
         tail %trailing index
+        isCommonQueue
     end
     
 %% Methods
     methods
-        function empty = isQueueEmpty(obj)
-            empty = (obj.head == obj.tail);
+        function queueIdx = getQueueIndex(obj, serverIdx)
+            if obj.isCommonQueue
+                queueIdx = 1;
+            else
+                queueIdx = serverIdx;
+            end
         end
         
-        function customer = drawFromQueue(obj)            
-            customer = obj.list{obj.head};
-            obj.head = obj.head + 1;
+        function empty = isQueueEmpty(obj, serverIdx)
+            queueIdx = obj.getQueueIndex(serverIdx);
+            empty = (obj.head(queueIdx) == obj.tail(queueIdx));
         end
         
-        function obj = addToQueue(obj, customer)
-            obj.list{obj.tail} = customer;
-            obj.tail = obj.tail + 1;
+        function customer = drawFromQueue(obj, serverIdx)
+            queueIdx = obj.getQueueIndex(serverIdx);
+            customer = obj.list{obj.head(queueIdx)};
+            obj.head(queueIdx) = obj.head(queueIdx) + 1;
+        end
+        
+        function obj = addToQueue(obj, customer, serverIdx)
+            queueIdx = obj.getQueueIndex(serverIdx);
+            obj.list{obj.tail(queueIdx)} = customer;
+            obj.tail(queueIdx) = obj.tail(queueIdx) + 1;
         end
         
         % Constructor
-        function obj = queueList(maxLength)
-            obj.list = cell(maxLength,1);
-            obj.head = 1;
-            obj.tail = 1;
+        function obj = queueList(maxLength, isCommonQueue, numServers)
+            if isCommonQueue
+                obj.list = cell(maxLength, 1);
+                obj.head = 1;
+                obj.tail = 1;
+            elseif ~isCommonQueue
+                obj.list = cell(maxLength, numServers);           
+                obj.head = ones(numServers,1);
+                obj.tail = ones(numServers,1);
+            end
+            
+            obj.isCommonQueue = isCommonQueue;
         end
     end
     

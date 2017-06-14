@@ -2,7 +2,8 @@
 
 maxPreSpace = 10000;
 maxQueueLength = 0;
-servers = 10;
+numServers = 10;
+isCommonQueue = 1;  %1 for common, no of queues = servers
 
 serviceDist = @() exprnd(8);            % mean service time
 % serviceDist = @() 1;                  % constant
@@ -10,7 +11,7 @@ serviceDist = @() exprnd(8);            % mean service time
 
 arrivalDist = @() exprnd(1);            % mean arrival time
 
-numExperiments = 10;
+numExperiments = 1;
 blockedCounts = zeros(numExperiments,1);
 eventCounts = zeros(numExperiments,1);
 customerCounts = zeros(numExperiments,1);
@@ -20,7 +21,7 @@ rng(1);
 
 for i=1:numExperiments
     
-    lists = initialize(maxPreSpace, servers, serviceDist, arrivalDist);
+    lists = initialize(maxPreSpace, numServers, arrivalDist, isCommonQueue);
     nextEvent = lists.events.next();
     
     % Simulating discrete event
@@ -37,7 +38,7 @@ for i=1:numExperiments
                     block = 0;
                 end                
             case 'Departure'
-                [lists,queueTime] = depart(lists, nextEvent, serviceDist, arrivalDist, nextEvent.timeStamp);
+                [lists,queueTime] = depart(lists, nextEvent, serviceDist, nextEvent.timeStamp);
         end
         
         %Saving statistical data
