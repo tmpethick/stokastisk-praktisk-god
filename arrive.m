@@ -6,8 +6,8 @@ function [lists,block] = arrive(lists, D, currentTime, maxQueueLength,...
     block = 0;
     if lists.servers.hasFreeServer()
         %Occupy server
-        index = lists.servers.getFreeServer();
-        lists.servers.occupyServer(index);
+        serverIdx = lists.servers.getFreeServer();
+        lists.servers.occupyServer(serverIdx);
 
         %Raise departure event
         if indicator == 1
@@ -16,14 +16,25 @@ function [lists,block] = arrive(lists, D, currentTime, maxQueueLength,...
             t = D.fewItemsDist();
         end
         event = struct('type','Departure','timeStamp', currentTime + t);
-        event.payload.serverIdx = index;       %Payload is associated data. Server index is used to free up server in departure events
+        event.payload.serverIdx = serverIdx;       %Payload is associated data. Server index is used to free up server in departure events
         lists.events.addToEventList(event);
     else
         customer.timeStamp = currentTime;
-        if lists.queue.tail-lists.queue.head >= maxQueueLength
+        
+        %Finding shortest queue (if there is no common queue)
+        if lists.queue.isCommonQueue
+            queueIdx = 1;
+        else
+            queueSizes = lists.queue.tail-lists.queue.head;
+            queueIdx = find(queueSizes == min(queueSizes));
+            queueIdx = queueIdx(1);
+        end
+        
+        %Checking whether customer is blocked or added to queue
+        if lists.queue.tail(queueIdx)-lists.queue.head(queueIdx) >= maxQueueLength
             block = 1;
         else
-            lists.queue.addToQueue(customer);
+            lists.queue.addToQueue(customer, queueIdx);
         end
     end
     

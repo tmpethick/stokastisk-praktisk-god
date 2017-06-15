@@ -1,12 +1,12 @@
-function [lists,queueTime] = depart(lists, event, D, currentTime,probManyItems)
+function [lists,queueTime] = depart(lists, event, D, currentTime)
+
 %% Freeing up the server
     lists.servers.freeServer(event.payload.serverIdx);
 %% Draw from queue
     queueTime = 0;
-    if ~lists.queue.isQueueEmpty()
-        
-        %Occupy server
-        customer = lists.queue.drawFromQueue();
+    if ~lists.queue.isQueueEmpty(event.payload.serverIdx)
+        %Occupy server        
+        customer = lists.queue.drawFromQueue(event.payload.serverIdx);
         queueTime = currentTime - customer.timeStamp;
         lists.servers.occupyServer(event.payload.serverIdx);
 
