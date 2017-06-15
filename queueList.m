@@ -34,6 +34,10 @@ classdef queueList < handle
             obj.tail(queueIdx) = obj.tail(queueIdx) + 1;
         end
         
+        function size = getQueueSizes(obj)
+            size = obj.tail-obj.head;
+        end
+        
         % Constructor
         function obj = queueList(maxLength, isCommonQueue, numServers)
             if isCommonQueue

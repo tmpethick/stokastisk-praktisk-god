@@ -3,6 +3,7 @@ function [lists,queueTime] = depart(lists, event, D, currentTime)
 %% Freeing up the server
     lists.servers.freeServer(event.payload.serverIdx);
 %% Draw from queue
+
     queueTime = 0;
     if ~lists.queue.isQueueEmpty(event.payload.serverIdx)
         %Occupy server        

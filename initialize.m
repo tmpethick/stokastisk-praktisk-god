@@ -7,7 +7,9 @@ function [lists] = initialize(maxPreSpace, numServers, D, isCommonQueue)
     event.type = 'Arrival';
     event.timeStamp = D.arrivalDist();
     lists.events.addToEventList(event);
-    
+
+%% Preparing breaks
+    lists.breakOn = zeros(numServers,1);
 %% Preparing servers availability
     lists.servers = serverList(numServers);
 %% Preparing queue list

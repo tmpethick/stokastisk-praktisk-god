@@ -1,4 +1,4 @@
-function [lists,block] = arrive(lists, D, currentTime, maxQueueLength,...
+function [lists,block,queueSizes] = arrive(lists, D, currentTime, maxQueueLength,...
                                 probManyItems,customer)    
 %% Generate departure event or add to queue
     indicator = binornd(1,probManyItems,1,1);
@@ -25,7 +25,9 @@ function [lists,block] = arrive(lists, D, currentTime, maxQueueLength,...
         if lists.queue.isCommonQueue
             queueIdx = 1;
         else
-            queueSizes = lists.queue.tail-lists.queue.head;
+            %lists.queue.tail-lists.queue.head
+            queueSizes = lists.queue.getQueueSizes();
+            queueSizes(lists.breakOn==1) = 100000000;
             queueIdx = find(queueSizes == min(queueSizes));
             queueIdx = queueIdx(1);
         end
