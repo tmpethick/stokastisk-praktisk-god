@@ -22,6 +22,19 @@ classdef queueList < handle
             empty = (obj.head(queueIdx) == obj.tail(queueIdx));
         end
         
+        function queueIdx = getFreeQueue(obj,breakOn)
+            if obj.isCommonQueue
+                queueIdx = 1;
+            else
+                queueSizes = obj.getQueueSizes();
+                queueSizes(breakOn==1) = 10000000000; % Some number larger than maxQueueSize 
+                queueIdxs = find(queueSizes == min(queueSizes));
+                %Choose random queue from the list of queues with minimal
+                %length
+                queueIdx = queueIdxs(randi(length(queueIdxs)));
+            end
+        end
+        
         function customer = drawFromQueue(obj, serverIdx)
             queueIdx = obj.getQueueIndex(serverIdx);
             customer = obj.list{obj.head(queueIdx)};

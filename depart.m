@@ -6,18 +6,20 @@ function [lists,queueTime] = depart(lists, event, D, currentTime)
 
     queueTime = 0;
     if ~lists.queue.isQueueEmpty(event.payload.serverIdx)
-        %Occupy server        
+        % Draw service time from distribution
         customer = lists.queue.drawFromQueue(event.payload.serverIdx);
+        if customer.type == 1
+            serviceTime = D.manyItemsDist();
+        else
+            serviceTime = D.fewItemsDist();
+        end
+        
+        %Occupy server        
         queueTime = currentTime - customer.timeStamp;
-        lists.servers.occupyServer(event.payload.serverIdx);
+        lists.servers.occupyServer(event.payload.serverIdx, serviceTime);
 
         %Raise departure event
-        if customer.type == 1
-            t = D.manyItemsDist();
-        else
-            t = D.fewItemsDist();
-        end
-        newEvent = struct('type','Departure','timeStamp', currentTime + t);
+        newEvent = struct('type','Departure','timeStamp', currentTime + serviceTime);
         newEvent.payload.serverIdx = event.payload.serverIdx;    %Payload is associated data. Server index is used to free up server in departure events
         lists.events.addToEventList(newEvent);
     end

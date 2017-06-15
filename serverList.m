@@ -3,22 +3,25 @@ classdef serverList < handle
     properties
         status
         type
+        timeOccupied
     end
 
 %% Methods
     methods
 
-        function obj = occupyServer(obj, serverIdx)
+        function obj = occupyServer(obj, serverIdx, serviceTime)
             obj.status(serverIdx) = ServerStatus.Occupied;
+            obj.timeOccupied(serverIdx) = serviceTime; %obj.timeOccupied(serverIdx) +
         end
         
         function obj = freeServer(obj, serverIdx)
             obj.status(serverIdx) = ServerStatus.Free;
         end
 
-        function index = getFreeServer(obj)
-            indexes = find(obj.status== ServerStatus.Free);
-            index = indexes(1);
+        function serverIdx = getFreeServer(obj)
+            serverIdxs = find(obj.status== ServerStatus.Free);
+            % Choose one server randomly from the list of all free servers
+            serverIdx = serverIdxs(randi(length(serverIdxs)));
         end
 
         function has = hasFreeServer(obj)
@@ -26,9 +29,10 @@ classdef serverList < handle
         end
 
         % Constructor
-        function obj = serverList(n_s)
-            obj.status    = zeros(n_s,1);
-            obj.type      = zeros(n_s,1);
+        function obj = serverList(numServers)
+            obj.status    = zeros(numServers,1);
+            obj.type      = zeros(numServers,1);
+            obj.timeOccupied = zeros(numServers,1);
         end
     end
     
