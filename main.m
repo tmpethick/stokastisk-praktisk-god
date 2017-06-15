@@ -1,18 +1,18 @@
 %% Using servicetime = exponential, betweentime = exponential
 
 maxPreSpace = 10000;
-maxQueueLength = 10;
-nSelfService = 4;
-nNormalService = 6;
-servers = nSelfService+nNormalService;
-probNormalService = 0.6;
+maxQueueLength = 0;
+servers = 10;
+probManyItems = 0;
 
-selfServiceDist = @() exprnd(10);            % mean service time for self
-normalServiceDist = @() exprnd(15);          % mean service time for normal
+D = struct();
+D.fewItemsDist = @() exprnd(8);            % mean service time for self
+D.manyItemsDist = @() exprnd(50);          % mean service time for normal
 % serviceDist = @() 1;                  % constant
 % serviceDist = @() 1*rand^(-1/2.05);   % pareto beta=1, k=2.05
 
-arrivalDist = @() exprnd(0.5);            % mean arrival time
+D.arrivalDist = @() exprnd(1);            % mean arrival time
+
 
 numExperiments = 10;
 blockedCounts = zeros(numExperiments,1);
@@ -25,17 +25,15 @@ rng(1);
 
 for i=1:numExperiments
     
-    lists = initialize(maxPreSpace, servers, nSelfService, arrivalDist);
+    lists = initialize(maxPreSpace, servers, D);
     nextEvent = lists.events.next();
     
     % Simulating discrete event
     while (nextEvent.timeStamp < maxT)
         switch nextEvent.type
             case 'Arrival'
-                [lists,block] = arrive(lists, selfServiceDist,...
-                                        normalServiceDist, arrivalDist,...
-                                        nextEvent.timeStamp,...
-                                        maxQueueLength,probNormalService);
+                [lists,block] = arrive(lists, D, nextEvent.timeStamp,...
+                                        maxQueueLength,probManyItems);
 
                 %Gathering statistical data
                 if nextEvent.timeStamp > burnInPeriod
@@ -44,7 +42,8 @@ for i=1:numExperiments
                     block = 0;
                 end                
             case 'Departure'
-                [lists,queueTime] = depart(lists, nextEvent, serviceDist, arrivalDist, nextEvent.timeStamp);
+                [lists,queueTime] = depart(lists, nextEvent, D, nextEvent.timeStamp,...
+                                            probManyItems);
                 queueTimes{i} = [queueTimes{i} queueTime];
         end
         %Saving statistical data

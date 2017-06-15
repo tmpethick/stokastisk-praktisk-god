@@ -17,20 +17,18 @@ classdef serverList < handle
         end
 
         function index = getFreeServer(obj)
-            indexes = find(obj.status == ServerStatus.Free);
+            indexes = find(obj.status== ServerStatus.Free);
             index = indexes(1);
         end
 
         function has = hasFreeServer(obj)
-            has = sum(obj.status) < length(obj.status);
+             has = sum(obj.status) < length(obj.status);
         end
 
         % Constructor
-        function obj = serverList(n_s,nSelfService)
+        function obj = serverList(n_s)
             obj.status    = zeros(n_s,1);
-            obj.type        = cell(n_s,1);
-            obj.type{1:nSelfService} = 'Self-Service';
-            obj.type{nSelfService+1:end} = 'Normal Service';
+            obj.type      = zeros(n_s,1);
         end
     end
     
