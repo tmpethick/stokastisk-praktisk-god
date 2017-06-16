@@ -23,12 +23,10 @@ for i=1:(N.numExperiments)
             if max(lists.queue.getQueueSizes()) > N.breakThresholds(1)*N.maxQueueLength && sum(lists.breakOn) >= 1
                 event = struct('type','BreakOff','timeStamp', nextEvent.timeStamp+eps);
                 lists.events.addToEventList(event);
-                disp('BreakOff')
             end
             if max(lists.queue.getQueueSizes()) < N.breakThresholds(2) && sum(lists.breakOn)< N.numServers-1
                 event = struct('type','BreakOn','timeStamp', nextEvent.timeStamp+eps);
                 lists.events.addToEventList(event);
-                disp('BreakOn')
             end
         end
         switch nextEvent.type
