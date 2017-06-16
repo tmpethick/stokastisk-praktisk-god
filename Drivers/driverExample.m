@@ -1,21 +1,23 @@
 %% Set parameters
 N = struct();
-N.maxPreSpace = 10000;
-N.maxQueueLength = 10;
-N.initialServers = 5;
-N.maxServers = 10;
-N.isCommonQueue = 0;  %Set to for a single common queue. Set to 0 for many queues, i.e. one queue for each server
-N.probManyItems = 0;
-N.numExperiments = 10;
-N.maxT = 60*14*12;
-N.burnInPeriod = 60*14;
-N.breakThresholds = [0.7 1];
-N.isBreakPossible = true;
+N.maxPreSpace       = 10000;
+N.maxQueueLength    = 10;
+N.initialServers    = 5;
+N.maxServers        = 10;
+%Set commonqueue to for a single common queue. Set to 0 for many queues, 
+% i.e. one queue for each server
+N.isCommonQueue     = 0;
+N.probManyItems     = 0;
+N.numExperiments    = 10;
+N.maxT              = 60*14*12;
+N.burnInPeriod      = 60*14;
+N.breakThresholds   = [0.7 1];
+N.isBreakPossible   = true;
 
-D = struct();
-D.fewItemsDist = @() exprnd(8);            % mean service time for self
-D.manyItemsDist = @() exprnd(1);          % mean service time for normal
-D.arrivalDist = @() exprnd(1);            % mean inter arrival time
+D               = struct();
+D.fewItemsDist  = @() exprnd(8);        % mean service time for self
+D.manyItemsDist = @() exprnd(1);        % mean service time for normal
+D.arrivalDist   = @() exprnd(1);        % mean inter arrival time
 % serviceDist = @() 1;                  % constant
 % serviceDist = @() 1*rand^(-1/2.05);   % pareto beta=1, k=2.05
 
