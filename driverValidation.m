@@ -8,7 +8,7 @@ N.maxServers        = 10;
 % i.e. one queue for each server
 N.isCommonQueue     = 1;
 N.probManyItems     = 0;
-N.numExperiments    = 1;
+N.numExperiments    = 2;
 N.maxT              = 60*14*12;
 N.burnInPeriod      = 60*14;
 N.breakThresholds   = [0.7 1];
@@ -70,3 +70,7 @@ for i=1:N.numExperiments
     ExProbCusMustQueue(i) = nnz(cell2mat(O.queueTimes(i)))/O.customerCounts(i);
 end
 ExProbCusMustQueue = mean(ExProbCusMustQueue);
+%%
+% check if Little's law is satisfied
+lambda = O.customerCounts(1)/sum(cell2mat(O.responseTimes(1)));
+% must find mean customers in system 

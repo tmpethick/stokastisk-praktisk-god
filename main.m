@@ -11,6 +11,8 @@ eventCounts = zeros(N.numExperiments,1);
 serversOccupiedTimes = zeros(N.numExperiments, N.maxServers);
 customerCounts = zeros(N.numExperiments,1);
 queueTimes = cell(N.numExperiments,1);
+serviceTimes = cell(N.numExperiments,1);
+responseTimes = cell(N.numExperiments,1);
 O.BreakOnTime = [];
 O.BreakOffTime = [];
 
@@ -56,6 +58,8 @@ for i=1:(N.numExperiments)
                     %Gathering statistical data (queue times and occupied times
                     %for servers)
                     queueTimes{i} = [queueTimes{i} queueTime];
+                    serviceTimes{i} = [serviceTimes{i} nextEvent.payload.serviceTime];
+                    responseTimes{i} = [responseTimes{i} queueTime + nextEvent.payload.serviceTime];
 
                     serverIdx = nextEvent.payload.serverIdx;
                     serversOccupiedTimes(i, serverIdx) = ...
@@ -72,22 +76,25 @@ for i=1:(N.numExperiments)
                 
         end
         
+        
         %Saving statistical data
         
-        blockedCounts(i) = blockedCounts(i) + block;
-        block = 0;
-        eventCounts(i) = eventCounts(i) + 1;
-        nextEvent = lists.events.next();
-        countStabilizer = countStabilizer + 1;
+        blockedCounts(i)    = blockedCounts(i) + block;
+        block               = 0;
+        eventCounts(i)      = eventCounts(i) + 1;
+        nextEvent           = lists.events.next();
+        countStabilizer     = countStabilizer + 1;
     end
     disp(i)
 end
 
 O = struct();
-O.blockedCounts = blockedCounts;
-O.customerCounts = customerCounts;
-O.eventCounts = eventCounts;
-O.queueTimes = queueTimes;
-O.serversOccupiedTimes = serversOccupiedTimes;
+O.blockedCounts         = blockedCounts;
+O.customerCounts        = customerCounts;
+O.eventCounts           = eventCounts;
+O.queueTimes            = queueTimes;
+O.serversOccupiedTimes  = serversOccupiedTimes;
+O.responseTimes         = responseTimes;
+O.serviceTimes          = serviceTimes;
 
 end

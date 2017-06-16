@@ -21,6 +21,7 @@ function [lists,queueTime] = depart(lists, event, D, currentTime)
         %Raise departure event
         newEvent = struct('type','Departure','timeStamp', currentTime + serviceTime);
         newEvent.payload.serverIdx = event.payload.serverIdx;    %Payload is associated data. Server index is used to free up server in departure events
+        newEvent.payload.serviceTime = serviceTime;
         lists.events.addToEventList(newEvent);
     end
     
