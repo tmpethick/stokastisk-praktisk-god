@@ -8,7 +8,7 @@ N.maxServers        = 10;
 % i.e. one queue for each server
 N.isCommonQueue     = 1;
 N.probManyItems     = 0;
-N.numExperiments    = 10;
+N.numExperiments    = 1;
 N.maxT              = 60*14*12;
 N.burnInPeriod      = 60*14;
 N.breakThresholds   = [0.7 1];
