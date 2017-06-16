@@ -5,6 +5,7 @@ classdef queueList < handle
         head %leading index
         tail %trailing index
         isCommonQueue
+        maxQueueLength
     end
     
 %% Methods
@@ -27,7 +28,10 @@ classdef queueList < handle
                 queueIdx = 1;
             else
                 queueSizes = obj.getQueueSizes();
-                queueSizes(breakOn==1) = 10000000000; % Some number larger than maxQueueSize 
+                % For servers that are on break, set their queue size to
+                % maxQueueLength+1 such that they will never be chosen as
+                % the queue with minimal length.
+                queueSizes(breakOn==1) = obj.maxQueueLength+1;
                 queueIdxs = find(queueSizes == min(queueSizes));
                 %Choose random queue from the list of queues with minimal
                 %length
@@ -64,6 +68,7 @@ classdef queueList < handle
             end
             
             obj.isCommonQueue = isCommonQueue;
+            obj.maxQueueLength = maxLength;
         end
     end
     

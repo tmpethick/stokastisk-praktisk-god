@@ -2,9 +2,11 @@
 N = struct();
 N.maxPreSpace = 10000;
 N.maxQueueLength = 10;
+%Set isCommonQueue to 1 for a single common queue. Set to 0 for many
+%queues, i.e. one queue for each server
+N.isCommonQueue = 0; 
 N.initialServers = 5;
 N.maxServers = 10;
-N.isCommonQueue = 0;  %Set to for a single common queue. Set to 0 for many queues, i.e. one queue for each server
 N.probManyItems = 0;
 N.numExperiments = 10;
 N.maxT = 60*14*12;
