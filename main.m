@@ -1,9 +1,10 @@
 %% Using servicetime = exponential, betweentime = exponential
 
 maxPreSpace = 10000;
-maxQueueLength = 0;
-numServers = 10;
-isCommonQueue = 1;  %Set to for a single common queue. Set to 0 for many queues, i.e. one queue for each server
+maxQueueLength = 10;
+initialServers = 5;
+maxServers = 10;
+isCommonQueue = 0;  %Set to for a single common queue. Set to 0 for many queues, i.e. one queue for each server
 probManyItems = 0;
 
 D = struct();
@@ -20,7 +21,7 @@ D.arrivalDist = @() exprnd(1);            % mean inter arrival time
 numExperiments = 10;
 blockedCounts = zeros(numExperiments,1);
 eventCounts = zeros(numExperiments,1);
-serversOccupiedTimes = zeros(numExperiments, numServers);
+serversOccupiedTimes = zeros(numExperiments, maxServers);
 customerCounts = zeros(numExperiments,1);
 %The store is open for 14 hours
 maxT = 60*14*12;
@@ -31,7 +32,7 @@ rng(1);
 
 for i=1:numExperiments
 
-    lists = initialize(maxPreSpace, numServers, D,isCommonQueue);
+    lists = initialize(maxPreSpace, initialServers, maxServers, D,isCommonQueue);
 
     nextEvent = lists.events.next();
     countStabilizer = 0;
@@ -40,12 +41,12 @@ for i=1:numExperiments
         
         if countStabilizer > 20 && maxQueueLength ~= 0
         countStabilizer = 0;
-        if max(lists.queue.getQueueSizes()) > 0.7*maxQueueLength && sum(lists.breakOn) >= 1
+        if max(lists.queue.getQueueSizes()) >= 1*maxQueueLength && sum(lists.breakOn) >= 1
             event = struct('type','BreakOff','timeStamp', nextEvent.timeStamp+eps);
             lists.events.addToEventList(event);
             disp('BreakOff')
         end
-        if max(lists.queue.getQueueSizes()) < 1 && sum(lists.breakOn)< numServers-1
+        if max(lists.queue.getQueueSizes()) < 3 && sum(lists.breakOn)< maxServers-1
             event = struct('type','BreakOn','timeStamp', nextEvent.timeStamp+eps);
             lists.events.addToEventList(event);
             disp('BreakOn')
@@ -79,10 +80,10 @@ for i=1:numExperiments
 
             case 'BreakOn'
                 idx = find(lists.breakOn==0);
-                lists.breakOn(idx(1)) = 1;
+                lists.breakOn(idx(randi(length(idx)))) = 1; % Choose random server to put on break
             case 'BreakOff'
                 idx = find(lists.breakOn==1);
-                lists.breakOn(idx(1)) = 0;
+                lists.breakOn(idx(randi(length(idx)))) = 0; % Choose random server to take off break
                 
         end
         
@@ -90,7 +91,10 @@ for i=1:numExperiments
         
         blockedCounts(i) = blockedCounts(i) + block;
         block = 0;
-        eventCounts(i) = eventCounts(i) + 1;        
+        eventCounts(i) = eventCounts(i) + 1;  
+        if eventCounts(2) == 33
+            2+2;
+        end
         nextEvent = lists.events.next();
         countStabilizer = countStabilizer + 1;
     end
