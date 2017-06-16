@@ -5,26 +5,26 @@ end
 
 blockedCounts = zeros(N.numExperiments,1);
 eventCounts = zeros(N.numExperiments,1);
-serversOccupiedTimes = zeros(N.numExperiments, N.numServers);
+serversOccupiedTimes = zeros(N.numExperiments, N.maxServers);
 customerCounts = zeros(N.numExperiments,1);
 queueTimes = cell(N.numExperiments,1);
 
 for i=1:(N.numExperiments)
     
-    lists = initialize(N.maxPreSpace, N.numServers, D, N.isCommonQueue);
+    lists = initialize(N.maxPreSpace, N.initialServers, N.maxServers, D, N.isCommonQueue);
     
     nextEvent = lists.events.next();
     countStabilizer = 0;
     % Simulating discrete event
     while (nextEvent.timeStamp < N.maxT)
-        
+
         if countStabilizer > 20 && N.maxQueueLength ~= 0 && N.isBreakPossible
             countStabilizer = 0;
             if max(lists.queue.getQueueSizes()) > N.breakThresholds(1)*N.maxQueueLength && sum(lists.breakOn) >= 1
                 event = struct('type','BreakOff','timeStamp', nextEvent.timeStamp+eps);
                 lists.events.addToEventList(event);
             end
-            if max(lists.queue.getQueueSizes()) < N.breakThresholds(2) && sum(lists.breakOn)< N.numServers-1
+            if max(lists.queue.getQueueSizes()) < N.breakThresholds(2) && sum(lists.breakOn)< N.maxServers-1
                 event = struct('type','BreakOn','timeStamp', nextEvent.timeStamp+eps);
                 lists.events.addToEventList(event);
             end
@@ -57,10 +57,10 @@ for i=1:(N.numExperiments)
                 
             case 'BreakOn'
                 idx = find(lists.breakOn==0);
-                lists.breakOn(idx(1)) = 1;
+                lists.breakOn(idx(randi(length(idx)))) = 1; % Choose random server to put on break
             case 'BreakOff'
                 idx = find(lists.breakOn==1);
-                lists.breakOn(idx(1)) = 0;
+                lists.breakOn(idx(randi(length(idx)))) = 0; % Choose random server to take off break
                 
         end
         
