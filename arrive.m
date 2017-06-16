@@ -3,7 +3,7 @@ function [lists,block,queueSizes] = arrive(lists, D, currentTime, maxQueueLength
 %% Generate departure event or add to queue
     customer.type = binornd(1,probManyItems,1,1);
     block = 0;
-    if lists.servers.hasFreeServer()
+    if lists.servers.hasFreeServer(lists.breakOn)
         % Draw service time from distribution
         if customer.type == 1
             serviceTime = D.manyItemsDist();
@@ -11,7 +11,7 @@ function [lists,block,queueSizes] = arrive(lists, D, currentTime, maxQueueLength
             serviceTime = D.fewItemsDist();
         end
         %Occupy server
-        serverIdx = lists.servers.getFreeServer();
+        serverIdx = lists.servers.getFreeServer(lists.breakOn);
         lists.servers.occupyServer(serverIdx, serviceTime);
 
         %Raise departure event

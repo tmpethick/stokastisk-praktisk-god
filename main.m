@@ -1,4 +1,7 @@
 function O = main(D, N)
+%% Input parameters
+% D: Struct containing distribution functions
+% N : Struct containing scalar and vector input parameters
 if N.maxQueueLength==0 && N.isBreakPossible
     error('isBreaksPossible is true and maxQueueLength is 0. Breaks are not possible when maxQueueLength is 0.')
 elseif N.maxServers < N.initialServers
@@ -50,11 +53,12 @@ for i=1:(N.numExperiments)
             case 'Departure'
                 [lists,queueTime] = depart(lists, nextEvent, D, nextEvent.timeStamp);
                 
-                %Gathering statistical data (queue times and occupied times
-                %for servers)
-                queueTimes{i} = [queueTimes{i} queueTime];
-                
                 if nextEvent.timeStamp > N.burnInPeriod
+                    
+                    %Gathering statistical data (queue times and occupied times
+                    %for servers)
+                    queueTimes{i} = [queueTimes{i} queueTime];
+
                     serverIdx = nextEvent.payload.serverIdx;
                     serversOccupiedTimes(i, serverIdx) = ...
                         serversOccupiedTimes(i, serverIdx) + ...
@@ -78,7 +82,9 @@ for i=1:(N.numExperiments)
         nextEvent = lists.events.next();
         countStabilizer = countStabilizer + 1;
     end
-    disp(i)
+    if N.printProgress
+        disp(i);
+    end
 end
 
 O = struct();

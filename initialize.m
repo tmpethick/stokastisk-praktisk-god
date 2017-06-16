@@ -10,7 +10,7 @@ function [lists] = initialize(maxPreSpace, initialServers, maxServers, D, isComm
 
 %% Preparing breaks
     lists.breakOn = zeros(maxServers,1);
-    lists.breakOn(1:initialServers) = 1;
+    lists.breakOn((initialServers+1):end) = 1;
     
 %% Preparing servers availability
     lists.servers = serverList(maxServers);

@@ -11,21 +11,24 @@ classdef serverList < handle
 
         function obj = occupyServer(obj, serverIdx, serviceTime)
             obj.status(serverIdx) = ServerStatus.Occupied;
-            obj.timeOccupied(serverIdx) = serviceTime; %obj.timeOccupied(serverIdx) +
+            obj.timeOccupied(serverIdx) = serviceTime;
         end
         
         function obj = freeServer(obj, serverIdx)
             obj.status(serverIdx) = ServerStatus.Free;
         end
 
-        function serverIdx = getFreeServer(obj)
-            serverIdxs = find(obj.status== ServerStatus.Free);
+        function serverIdx = getFreeServer(obj, breakOn)
+            serverIdxs = find(obj.status== ServerStatus.Free & ~breakOn);
             % Choose one server randomly from the list of all free servers
             serverIdx = serverIdxs(randi(length(serverIdxs)));
         end
 
-        function has = hasFreeServer(obj)
-             has = sum(obj.status) < length(obj.status);
+        function has = hasFreeServer(obj, breakOn)
+             % Count all servers which are occupied or on break. If this
+             % count is less than the total number of servers, there is a
+             % free server
+             has = sum(obj.status | breakOn) < length(obj.status);
         end
 
         % Constructor
