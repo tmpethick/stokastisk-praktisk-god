@@ -1,4 +1,8 @@
 function O = main(D, N)
+addpath('.');
+addpath('./datastructures');
+addpath('./Drivers');
+
 if N.maxQueueLength==0 && N.isBreakPossible
     error('isBreaksPossible is true and maxQueueLength is 0. Breaks are not possible when maxQueueLength is 0.')
 end
@@ -44,7 +48,7 @@ for i=1:(N.numExperiments)
                 else
                     block = 0;
                 end
-                
+
             case 'Departure'
                 [lists,queueTime] = depart(lists, nextEvent, D, nextEvent.timeStamp);
                 
