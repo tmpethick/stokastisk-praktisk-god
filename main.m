@@ -1,6 +1,8 @@
 function O = main(D, N)
 if N.maxQueueLength==0 && N.isBreakPossible
     error('isBreaksPossible is true and maxQueueLength is 0. Breaks are not possible when maxQueueLength is 0.')
+elseif N.maxServers < N.initialServers
+    error('maxServers cannot be less than initialServers')
 end
 
 blockedCounts = zeros(N.numExperiments,1);
