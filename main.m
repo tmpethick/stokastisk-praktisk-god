@@ -8,6 +8,8 @@ eventCounts = zeros(N.numExperiments,1);
 serversOccupiedTimes = zeros(N.numExperiments, N.maxServers);
 customerCounts = zeros(N.numExperiments,1);
 queueTimes = cell(N.numExperiments,1);
+O.BreakOnTime = [];
+O.BreakOffTime = [];
 
 for i=1:(N.numExperiments)
     
@@ -23,10 +25,12 @@ for i=1:(N.numExperiments)
             if max(lists.queue.getQueueSizes()) > N.breakThresholds(1)*N.maxQueueLength && sum(lists.breakOn) >= 1
                 event = struct('type','BreakOff','timeStamp', nextEvent.timeStamp+eps);
                 lists.events.addToEventList(event);
+                O.BreakOffTime = [O.BreakOffTime nextEvent.timeStamp+eps];
             end
             if max(lists.queue.getQueueSizes()) < N.breakThresholds(2) && sum(lists.breakOn)< N.maxServers-1
                 event = struct('type','BreakOn','timeStamp', nextEvent.timeStamp+eps);
                 lists.events.addToEventList(event);
+                O.BreakOnTime = [O.BreakOnTime nextEvent.timeStamp+eps];
             end
         end
         switch nextEvent.type
