@@ -1,5 +1,6 @@
 %% Set parameters
 N = struct();
+
 N.maxPreSpace       = 10000;
 N.maxQueueLength    = 10;
 N.initialServers    = 5;
@@ -13,6 +14,7 @@ N.maxT              = 60*14*12;
 N.burnInPeriod      = 60*14;
 N.breakThresholds   = [0.7 1];
 N.isBreakPossible   = true;
+N.printProgress     = false;
 
 D               = struct();
 D.fewItemsDist  = @() exprnd(8);        % mean service time for self
@@ -28,9 +30,10 @@ O = main(D, N);
 
 %% Print and plot output
 % Print blocking fractions for all experiments and mean blocking fraction
-disp((O.blockedCounts./O.customerCounts)')
-disp(' ')
-disp(mean(O.blockedCounts./O.customerCounts))
+stringToPrint = sprintf('%.3f ', (O.blockedCounts./O.customerCounts)');
+fprintf('Blocking fractions for different experiments:\n%s\n',stringToPrint)
+fprintf('Mean of all Blocking fractions: %.3f\n',mean(O.blockedCounts./O.customerCounts))
+
 
 subplot(1,2,1)
 histogram(O.queueTimes{1}(O.queueTimes{1} ~= 0))
