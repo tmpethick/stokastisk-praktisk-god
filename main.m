@@ -48,11 +48,12 @@ for i=1:(N.numExperiments)
             case 'Departure'
                 [lists,queueTime] = depart(lists, nextEvent, D, nextEvent.timeStamp);
                 
-                %Gathering statistical data (queue times and occupied times
-                %for servers)
-                queueTimes{i} = [queueTimes{i} queueTime];
-                
                 if nextEvent.timeStamp > N.burnInPeriod
+                    
+                    %Gathering statistical data (queue times and occupied times
+                    %for servers)
+                    queueTimes{i} = [queueTimes{i} queueTime];
+                
                     serverIdx = nextEvent.payload.serverIdx;
                     serversOccupiedTimes(i, serverIdx) = ...
                         serversOccupiedTimes(i, serverIdx) + ...
