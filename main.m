@@ -79,7 +79,9 @@ for i=1:(N.numExperiments)
         nextEvent = lists.events.next();
         countStabilizer = countStabilizer + 1;
     end
-    disp(i)
+    if N.printProgress
+        disp(i);
+    end
 end
 
 O = struct();
