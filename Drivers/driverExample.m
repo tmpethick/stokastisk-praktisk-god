@@ -14,6 +14,7 @@ N.maxT              = 60*14*12;
 N.burnInPeriod      = 60*14;
 N.breakThresholds   = [0.7 1];
 N.isBreakPossible   = true;
+N.printProgress     = false;
 
 D               = struct();
 D.fewItemsDist  = @() exprnd(8);        % mean service time for self
