@@ -22,26 +22,18 @@ X = zeros(n,1);
 
 %% Generating the distribution if uniform values are given
 if ~generate_in_function
-<<<<<<< HEAD
     %Utilizing the parallel compatibility of matlab to reduce computational
     %time of the non-sequentially dependent loop
-    parfor i=1:n
-=======
     for i=1:n
->>>>>>> 8d206db759e307aa4d10d67d5a5f02e839de7eca
         alpha3 = betaincinv(Z(i,1),alpha1,alpha2);
         X(i) = (max-min)*alpha3+min;
     end
 end
 %% Generating the distribution if uniform values not given
 if generate_in_function
-<<<<<<< HEAD
     %Utilizing the parallel compatibility of matlab to reduce computational
     %time of the non-sequentially dependent loop
-    parfor i=1:n
-=======
     for i=1:n
->>>>>>> 8d206db759e307aa4d10d67d5a5f02e839de7eca
         U = rand;
         alpha3 = betaincinv(U,alpha1,alpha2);
         X(i) = (max-min)*alpha3+min;
