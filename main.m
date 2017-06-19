@@ -15,7 +15,7 @@ customerCounts = zeros(N.numExperiments,1);
 queueTimes = cell(N.numExperiments,1);
 serviceTimes = cell(N.numExperiments,1);
 responseTimes = cell(N.numExperiments,1);
-customersThroughPut = zeros(N.numExperiments,1);
+customersInSystem = zeros(N.numExperiments,1);
 O.BreakOnTime = [];
 O.BreakOffTime = [];
 
@@ -36,7 +36,7 @@ for i=1:(N.numExperiments)
         % find average customers in system
         % count how long time a certain number of customers is in the store
         if nextEvent.timeStamp > N.burnInPeriod
-            customersThroughPut(i) = customersThroughPut(i) +...
+            customersInSystem(i) = customersInSystem(i) +...
                                     currentCustomersInSystem * timeDiff;
         end
         
@@ -110,7 +110,7 @@ for i=1:(N.numExperiments)
         disp(i);
     end
     lastEvent                = nextEvent;
-    customersThroughPut(i)   = customersThroughPut(i)/...
+    customersInSystem(i)   = customersInSystem(i)/...
                                 (lastEvent.timeStamp - N.burnInPeriod); 
     
 end
@@ -123,6 +123,6 @@ O.queueTimes            = queueTimes;
 O.serversOccupiedTimes  = serversOccupiedTimes;
 O.responseTimes         = responseTimes;
 O.serviceTimes          = serviceTimes;
-O.customerThroughPut    = customersThroughPut;
+O.customersInSystem     = customersInSystem;
 
 end
