@@ -1,7 +1,13 @@
-function O = main(D, N)
 %% Input parameters
 % D: Struct containing distribution functions
 % N : Struct containing scalar and vector input parameters
+function O = main(D, N)
+
+% Adds paths
+addpath('.');
+addpath('./datastructures');
+addpath('./Drivers');
+
 if N.maxQueueLength==0 && N.isBreakPossible
     error('isBreaksPossible is true and maxQueueLength is 0. Breaks are not possible when maxQueueLength is 0.')
 elseif N.maxServers < N.initialServers
@@ -15,6 +21,7 @@ customerCounts = zeros(N.numExperiments,1);
 queueTimes = cell(N.numExperiments,1);
 serviceTimes = cell(N.numExperiments,1);
 responseTimes = cell(N.numExperiments,1);
+customersThroughPut = zeros(N.numExperiments,1);
 O.BreakOnTime = [];
 O.BreakOffTime = [];
 
@@ -24,9 +31,28 @@ for i=1:(N.numExperiments)
     
     nextEvent = lists.events.next();
     countStabilizer = 0;
+    currentCustomersInSystem = 0;
+    prevEvent.timeStamp = 0;
     % Simulating discrete event
     while (nextEvent.timeStamp < N.maxT)
-
+         
+        % track time since last event
+        timeDiff = nextEvent.timeStamp - prevEvent.timeStamp;
+        
+        % find average customers in system
+        % count how long time a certain number of customers is in the store
+        if nextEvent.timeStamp > N.burnInPeriod
+            customersThroughPut(i) = customersThroughPut(i) +...
+                                    currentCustomersInSystem * timeDiff;
+        end
+        
+        switch nextEvent.type
+            case 'Arrival'
+                currentCustomersInSystem = currentCustomersInSystem + 1;
+            case 'Depature'
+                currentCustomersInSystem = currentCustomersInSystem - 1;
+        end    
+        
         if countStabilizer > 20 && N.maxQueueLength ~= 0 && N.isBreakPossible
             countStabilizer = 0;
             if max(lists.queue.getQueueSizes()) > N.breakThresholds(1)*N.maxQueueLength && sum(lists.breakOn) >= 1
@@ -51,7 +77,7 @@ for i=1:(N.numExperiments)
                 else
                     block = 0;
                 end
-                
+
             case 'Departure'
                 [lists,queueTime] = depart(lists, nextEvent, D, nextEvent.timeStamp);
                 
@@ -78,18 +104,21 @@ for i=1:(N.numExperiments)
                 
         end
         
-        
         %Saving statistical data
-        
         blockedCounts(i)    = blockedCounts(i) + block;
         block               = 0;
         eventCounts(i)      = eventCounts(i) + 1;
+        prevEvent           = nextEvent;
         nextEvent           = lists.events.next();
         countStabilizer     = countStabilizer + 1;
     end
     if N.printProgress
         disp(i);
     end
+    lastEvent                = nextEvent;
+    customersThroughPut(i)   = customersThroughPut(i)/...
+                                (lastEvent.timeStamp - N.burnInPeriod); 
+    
 end
 
 O = struct();
@@ -100,5 +129,6 @@ O.queueTimes            = queueTimes;
 O.serversOccupiedTimes  = serversOccupiedTimes;
 O.responseTimes         = responseTimes;
 O.serviceTimes          = serviceTimes;
+O.customerThroughPut    = customersThroughPut;
 
 end
