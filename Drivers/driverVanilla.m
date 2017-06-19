@@ -34,7 +34,7 @@ rng(1);
 %% Call main function
 numExperimentGridPoints = 10;
 serviceTimeMeans = linspace(0.2,1.5,numExperimentGridPoints);
-interArrivalModes = linspace(0.5, 9, numExperimentGridPoints);
+interArrivalModes = linspace(1/12, 2, numExperimentGridPoints);
 
 queueTimeStats = cell(numExperimentGridPoints);
 DONStruct = cell(numExperimentGridPoints);
@@ -64,7 +64,7 @@ for i = 1:numExperimentGridPoints
     end
 end
 
-imagesc(log10(meanMatrix))
+imagesc((log(meanMatrix)))
 title('Mean queue time')
 ylabel('Service time mean')
 xlabel('Inter arrival mode')
@@ -76,7 +76,7 @@ for i = 1:numExperimentGridPoints
         stdMatrix(i,j) = mean(sqrt(queueTimeStats{i,j}.varVec));
     end
 end
-imagesc(stdMatrix)
+imagesc(log(stdMatrix))
 title('Mean queue time')
 ylabel('Service time mean')
 xlabel('Inter arrival mode')
