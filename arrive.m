@@ -1,22 +1,24 @@
-function [lists,block,queueSizes] = arrive(lists, D, currentTime, maxQueueLength,...
+function [lists,block] = arrive(lists, D, currentTime, maxQueueLength,...
                                 probManyItems,customer)    
 %% Generate departure event or add to queue
     customer.type = binornd(1,probManyItems,1,1);
     block = 0;
-    if lists.servers.hasFreeServer()
+    if lists.servers.hasFreeServer(lists.breakOn)
         % Draw service time from distribution
         if customer.type == 1
             serviceTime = D.manyItemsDist();
         else
             serviceTime = D.fewItemsDist();
         end
+
         %Occupy server
-        serverIdx = lists.servers.getFreeServer();
+        serverIdx = lists.servers.getFreeServer(lists.breakOn);
         lists.servers.occupyServer(serverIdx, serviceTime);
 
         %Raise departure event
         event = struct('type','Departure','timeStamp', currentTime + serviceTime);
         event.payload.serverIdx = serverIdx;       %Payload is associated data. Server index is used to free up server in departure events
+        event.payload.serviceTime = serviceTime;
         lists.events.addToEventList(event);
     else
         customer.timeStamp = currentTime;
