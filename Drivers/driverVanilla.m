@@ -54,8 +54,34 @@ for i = 1:length(serviceTimeMeans)
 end
 %%
 clear i j D O N
+c = clock
 save('FirstExperiment-1458-16-06')
-%% Print and plot output
+%% meanMatrix
+meanMatrix = zeros(numExperimentGridPoints);
+for i = 1:numExperimentGridPoints
+    for j = 1:numExperimentGridPoints
+        meanMatrix(i,j) = mean(queueTimeStats{i,j}.meanVec);
+    end
+end
+
+imagesc(log10(meanMatrix))
+title('Mean queue time')
+ylabel('Service time mean')
+xlabel('Inter arrival mode')
+colorbar
+%% stdMatrix
+stdMatrix = zeros(numExperimentGridPoints);
+for i = 1:numExperimentGridPoints
+    for j = 1:numExperimentGridPoints
+        stdMatrix(i,j) = mean(sqrt(queueTimeStats{i,j}.varVec));
+    end
+end
+imagesc(stdMatrix)
+title('Mean queue time')
+ylabel('Service time mean')
+xlabel('Inter arrival mode')
+colorbar;
+
 % Print blocking fractions for all experiments and mean blocking fraction
 % stringToPrint = sprintf('%.3f ', (O.blockedCounts./O.customerCounts)');
 % fprintf('Blocking fractions for different experiments:\n%s\n',stringToPrint)
