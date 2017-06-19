@@ -7,15 +7,20 @@ N.probManyItems     = 0;
 
 %% Set parameters
 N.maxPreSpace       = 50000;
-N.maxQueueLength    = 5;
 
 % maxServers does not matter in this driver, since isBreakPossible = false.
 % Just ensure that maxServers is larger than initialServers
 N.initialServers    = 2;
 N.maxServers        = 2;
-%Set commonqueue to for a single common queue. Set to 0 for many queues, 
+% Set commonqueue to for a single common queue. Set to 0 for many queues, 
 % i.e. one queue for each server
-N.isCommonQueue     = 0;
+N.isCommonQueue     = 1;
+N.maxQueueLength    = 5;
+% Adjust max queue size such that common queue and no common queue
+% scenarios are comparable
+if N.isCommonQueue
+    N.maxQueueLength = N.maxQueueLength*N.maxServers;
+end
 N.numExperiments    = 50;
 N.maxT              = 60*14;
 N.burnInPeriod      = 0;
@@ -57,30 +62,61 @@ clear i j D O N
 c = clock;
 save(sprintf('Drivers/driverVanillaExp-%d-%d-%d-%d-%d',c(1),c(2),c(3),c(4),c(5)))
 %% meanMatrix
-meanMatrix = zeros(numExperimentGridPoints);
+figure
+meanMatrix = NaN(numExperimentGridPoints);
+stdMatrix = NaN(numExperimentGridPoints);
+medianMatrix = NaN(numExperimentGridPoints);
+eventCountMatrix = NaN(numExperimentGridPoints);
 for i = 1:numExperimentGridPoints
     for j = 1:numExperimentGridPoints
         meanMatrix(i,j) = mean(queueTimeStats{i,j}.meanVec);
+        stdMatrix(i,j) = mean(sqrt(queueTimeStats{i,j}.varVec));
+        medianMatrix(i,j) = mean(queueTimeStats{i,j}.medianVec);
+        eventCountMatrix(i,j) = mean(DONStruct{i,j}.O.blockedCounts./(DONStruct{i,j}.O.customerCounts));
     end
 end
 
-imagesc((log(meanMatrix)))
+subplot(2,2,1)
+imagesc((meanMatrix))
 title('Mean queue time')
 ylabel('Service time mean')
 xlabel('Inter arrival mode')
 colorbar
-%% stdMatrix
-stdMatrix = zeros(numExperimentGridPoints);
-for i = 1:numExperimentGridPoints
-    for j = 1:numExperimentGridPoints
-        stdMatrix(i,j) = mean(sqrt(queueTimeStats{i,j}.varVec));
-    end
-end
-imagesc(log(stdMatrix))
-title('Mean queue time')
+
+set(gca,'Fontsize',8)
+set(gca,'xtick',interArrivalModes);
+
+subplot(2,2,2)
+imagesc(medianMatrix)
+title('Median for queue time')
 ylabel('Service time mean')
 xlabel('Inter arrival mode')
 colorbar;
+set(gca,'Fontsize',20)
+
+subplot(2,2,3)
+imagesc(stdMatrix)
+title('Standard deviation for queue time')
+ylabel('Service time mean')
+xlabel('Inter arrival mode')
+colorbar;
+set(gca,'Fontsize',20)
+
+subplot(2,2,3)
+imagesc(stdMatrix)
+title('Standard deviation for queue time')
+ylabel('Service time mean')
+xlabel('Inter arrival mode')
+colorbar;
+set(gca,'Fontsize',20)
+
+subplot(2,2,4)
+imagesc(eventCountMatrix)
+title('Blocking fraction for one business day')
+ylabel('Service time mean')
+xlabel('Inter arrival mode')
+colorbar;
+set(gca,'Fontsize',20)
 
 %% Print and plot output
 
