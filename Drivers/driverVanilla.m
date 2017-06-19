@@ -14,7 +14,7 @@ N.initialServers    = 2;
 N.maxServers        = 2;
 % Set commonqueue to for a single common queue. Set to 0 for many queues, 
 % i.e. one queue for each server
-N.isCommonQueue     = 0;
+N.isCommonQueue     = 1;
 N.maxQueueLength    = 5;
 % Adjust max queue size such that common queue and no common queue
 % scenarios are comparable
@@ -41,26 +41,39 @@ numExperimentGridPoints = 10;
 serviceTimeMeans = linspace(0.1,1.3,numExperimentGridPoints);
 interArrivalModes = linspace(1/5, 2, numExperimentGridPoints);
 
+serviceTimeStats = cell(numExperimentGridPoints);
 queueTimeStats = cell(numExperimentGridPoints);
+waitTimeStats = cell(numExperimentGridPoints);
 DONStruct = cell(numExperimentGridPoints);
 for i = 1:length(serviceTimeMeans)
     for j = 1:length(interArrivalModes)
         fprintf('i,j: %d, %d\n',i,j)
         D.fewItemsDist  = @() lognrnd(serviceTimeMeans(i),0.3);
         D.arrivalDist   = @() PertDist(1/60,interArrivalModes(j),5,[],1);
+        % Run experiment
         O = main(D, N);
         DONStruct{i,j}.D = D;
         DONStruct{i,j}.O = O;
         DONStruct{i,j}.N = N;
+        
+        % Compute stats
+        serviceTimeStats{i,j} = cellfun(@mean, O.serviceTimes);
+        serviceTimeStats{i,j} = cellfun(@var, O.serviceTimes);
+        serviceTimeStats{i,j} = cellfun(@median, O.serviceTimes);
         queueTimeStats{i,j}.meanVec = cellfun(@mean, O.queueTimes);
         queueTimeStats{i,j}.varVec = cellfun(@var, O.queueTimes);
         queueTimeStats{i,j}.medianVec = cellfun(@median, O.queueTimes);
+        waitTime = cellfun(@plus, O.queueTimes, O.serviceTimes,'Un',false);
+        waitTimeStats{i,j}.meanVec = cellfun(@mean,waitTime);
+        waitTimeStats{i,j}.varVec = cellfun(@var,waitTime);
+        waitTimeStats{i,j}.medianVec = cellfun(@median,waitTime);
+
     end
 end
 %%
 clear i j D O N
 c = clock;
-save(sprintf('Drivers/driverVanillaExp-%d-%d-%d-%d-%d',c(1),c(2),c(3),c(4),c(5)))
+save(sprintf('Drivers/driverVanillaExp-%d-%d-%d-%d-%d-%d',c(1),c(2),c(3),c(4),c(5),c(6)))
 %% Plot mean 
 figure
 meanMatrix = NaN(numExperimentGridPoints);
@@ -90,7 +103,7 @@ set(gca,'yTickLabel',num2str(serviceTimeMeans','%2.2f'));
 
 
 subplot(2,2,2)
-imagesc(medianMatrix)
+imagesc((medianMatrix))
 title('Median for queue time')
 ylabel('Service time mean')
 xlabel('Inter arrival mode')
@@ -136,18 +149,21 @@ set(gca,'yTickLabel',num2str(serviceTimeMeans','%2.2f'));
 %% Histogram of queue times
 for i = 1:numExperimentGridPoints
     for j = 1:numExperimentGridPoints
-        combinedQueueTimes = [];
+        combinedWaitTimes = [];
         for k = 1:length(DONStruct{i,j}.O.queueTimes)
-            tempQueueTimes = DONStruct{i,j}.O.queueTimes{k}';
-            tempQueueTimes = tempQueueTimes(tempQueueTimes~=0);
-            combinedQueueTimes = [combinedQueueTimes; tempQueueTimes];
+            %tempQueueTimes = DONStruct{i,j}.O.queueTimes{k}';
+            %tempQueueTimes = tempQueueTimes(tempQueueTimes~=0);
+            combinedWaitTimes = [combinedWaitTimes, DONStruct{i,j}.O.queueTimes{k}];%+DONStruct{i,j}.O.serviceTimes{k}];
         end
         subplot(10,10,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
-        histogram(combinedQueueTimes,'Normalization','pdf')
+        histogram(combinedWaitTimes,'Normalization','pdf')
+        %plot(sort(combinedWaitTimes),(1:length(combinedWaitTimes))/length(combinedWaitTimes)) 
         xlim([0 40])
     end
 end
 
+%% Percentage of customers who wait less than X minutes
+plot(combinedWaitTimes, (1:length(combinedWaitTimes)/length(combinedWaitTimes)))
 %% Print and plot output
 
 % Print blocking fractions for all experiments and mean blocking fraction
