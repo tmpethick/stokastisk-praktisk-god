@@ -54,8 +54,8 @@ for i = 1:length(serviceTimeMeans)
 end
 %%
 clear i j D O N
-c = clock
-save('FirstExperiment-1458-16-06')
+c = clock;
+save(sprintf('Drivers/driverVanillaExp-%d-%d-%d-%d-%d',c(1),c(2),c(3),c(4),c(5)))
 %% meanMatrix
 meanMatrix = zeros(numExperimentGridPoints);
 for i = 1:numExperimentGridPoints
@@ -81,6 +81,8 @@ title('Mean queue time')
 ylabel('Service time mean')
 xlabel('Inter arrival mode')
 colorbar;
+
+%% Print and plot output
 
 % Print blocking fractions for all experiments and mean blocking fraction
 % stringToPrint = sprintf('%.3f ', (O.blockedCounts./O.customerCounts)');
