@@ -14,7 +14,7 @@ N.initialServers    = 2;
 N.maxServers        = 2;
 % Set commonqueue to for a single common queue. Set to 0 for many queues, 
 % i.e. one queue for each server
-N.isCommonQueue     = 1;
+N.isCommonQueue     = 0;
 N.maxQueueLength    = 5;
 % Adjust max queue size such that common queue and no common queue
 % scenarios are comparable
@@ -38,8 +38,8 @@ rng(1);
 
 %% Call main function
 numExperimentGridPoints = 10;
-serviceTimeMeans = linspace(0.2,1.5,numExperimentGridPoints);
-interArrivalModes = linspace(1/12, 2, numExperimentGridPoints);
+serviceTimeMeans = linspace(0.1,1.3,numExperimentGridPoints);
+interArrivalModes = linspace(1/5, 2, numExperimentGridPoints);
 
 queueTimeStats = cell(numExperimentGridPoints);
 DONStruct = cell(numExperimentGridPoints);
@@ -47,7 +47,7 @@ for i = 1:length(serviceTimeMeans)
     for j = 1:length(interArrivalModes)
         fprintf('i,j: %d, %d\n',i,j)
         D.fewItemsDist  = @() lognrnd(serviceTimeMeans(i),0.3);
-        D.arrivalDist   = @() PertDist(0.017,interArrivalModes(j),10,[],1);
+        D.arrivalDist   = @() PertDist(1/60,interArrivalModes(j),5,[],1);
         O = main(D, N);
         DONStruct{i,j}.D = D;
         DONStruct{i,j}.O = O;
