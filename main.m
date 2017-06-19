@@ -1,7 +1,13 @@
-function O = main(D, N)
 %% Input parameters
 % D: Struct containing distribution functions
 % N : Struct containing scalar and vector input parameters
+function O = main(D, N)
+
+% Adds paths
+addpath('.');
+addpath('./datastructures');
+addpath('./Drivers');
+
 if N.maxQueueLength==0 && N.isBreakPossible
     error('isBreaksPossible is true and maxQueueLength is 0. Breaks are not possible when maxQueueLength is 0.')
 elseif N.maxServers < N.initialServers
@@ -71,7 +77,7 @@ for i=1:(N.numExperiments)
                 else
                     block = 0;
                 end
-                
+
             case 'Departure'
                 [lists,queueTime] = depart(lists, nextEvent, D, nextEvent.timeStamp);
                 
