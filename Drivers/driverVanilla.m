@@ -37,16 +37,16 @@ D.arrivalDist   = @() PertDist(0.017,1.5,10,[],1);     % mean inter arrival time
 rng(1);
 
 %% Call main function
-numExperimentGridPoints = 10;
-serviceTimeMeans = linspace(0.1,1.3,numExperimentGridPoints);
-interArrivalModes = linspace(1/5, 2, numExperimentGridPoints);
+numExperimentGridPoints = 1;
+serviceTimeMeans = linspace(0.65*0.7,0.65*1.3,numExperimentGridPoints);
+interArrivalModes = linspace(0.3*0.7, 0.3*1.3, numExperimentGridPoints);
 
 queueTimeStats = cell(numExperimentGridPoints);
 DONStruct = cell(numExperimentGridPoints);
 for i = 1:length(serviceTimeMeans)
     for j = 1:length(interArrivalModes)
         fprintf('i,j: %d, %d\n',i,j)
-        D.fewItemsDist  = @() lognrnd(serviceTimeMeans(i),0.3);
+        D.fewItemsDist  = @() lognrnd(serviceTimesMeans,0.3);
         D.arrivalDist   = @() PertDist(1/60,interArrivalModes(j),5,[],1);
         O = main(D, N);
         DONStruct{i,j}.D = D;
@@ -76,12 +76,14 @@ for i = 1:numExperimentGridPoints
     end
 end
 
+
 subplot(2,2,1)
-imagesc((meanMatrix))
+imagesc(meanMatrix)
 title('Mean queue time')
 ylabel('Service time mean')
 xlabel('Inter arrival mode')
 colorbar
+caxis([0,18])
 set(gca,'Fontsize',12)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
@@ -95,6 +97,92 @@ title('Median for queue time')
 ylabel('Service time mean')
 xlabel('Inter arrival mode')
 colorbar
+caxis([0,18])
+set(gca,'Fontsize',12)
+set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'XTickLabel',num2str(interArrivalModes','%2.2f'));
+set(gca,'yTickLabel',num2str(serviceTimeMeans','%2.2f'));
+
+subplot(2,2,3)
+imagesc(stdMatrix)
+title('Standard deviation for queue time')
+ylabel('Service time mean')
+xlabel('Inter arrival mode')
+colorbar;
+set(gca,'Fontsize',20)
+
+subplot(2,2,3)
+imagesc(stdMatrix)
+title('Standard deviation for queue time')
+ylabel('Service time mean')
+xlabel('Inter arrival mode')
+colorbar
+set(gca,'Fontsize',12)
+set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'XTickLabel',num2str(interArrivalModes','%2.2f'));
+set(gca,'yTickLabel',num2str(serviceTimeMeans','%2.2f'));
+
+subplot(2,2,4)
+imagesc(eventCountMatrix)
+title('Blocking fraction for one business day')
+ylabel('Service time mean')
+xlabel('Inter arrival mode')
+colorbar
+set(gca,'Fontsize',12)
+set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'XTickLabel',num2str(interArrivalModes','%2.2f'));
+set(gca,'yTickLabel',num2str(serviceTimeMeans','%2.2f'));
+
+%% Without zeros 
+
+for i = 1:length(serviceTimeMeans)
+    for j = 1:length(interArrivalModes)
+        for k = 1:N.numExperiments
+            DONStruct{i,j}.O.queueTimesw0{k} = DONStruct{i,j}.O.queueTimes{k}(DONStruct{i,j}.O.queueTimes{k}~=0);
+        end
+        queueTimeStats{i,j}.meanVecw0 = cellfun(@mean, DONStruct{i,j}.O.queueTimesw0);
+        queueTimeStats{i,j}.varVecw0 = cellfun(@var, DONStruct{i,j}.O.queueTimesw0);
+        queueTimeStats{i,j}.medianVecw0 = cellfun(@median, DONStruct{i,j}.O.queueTimesw0);
+    end
+end
+figure
+meanMatrixw0 = NaN(numExperimentGridPoints);
+stdMatrixw0 = NaN(numExperimentGridPoints);
+medianMatrixw0 = NaN(numExperimentGridPoints);
+eventCountMatrix = NaN(numExperimentGridPoints);
+for i = 1:numExperimentGridPoints
+    for j = 1:numExperimentGridPoints
+        meanMatrixw0(i,j) = mean(queueTimeStats{i,j}.meanVecw0);
+        stdMatrixw0(i,j) = mean(sqrt(queueTimeStats{i,j}.varVecw0));
+        medianMatrixw0(i,j) = mean(queueTimeStats{i,j}.medianVecw0);
+        eventCountMatrix(i,j) = mean(DONStruct{i,j}.O.blockedCounts./(DONStruct{i,j}.O.customerCounts));
+    end
+end
+
+subplot(2,2,1)
+imagesc(meanMatrixw0)
+title('Mean queue time')
+ylabel('Service time mean')
+xlabel('Inter arrival mode')
+colorbar
+caxis([0,18])
+set(gca,'Fontsize',12)
+set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'XTickLabel',num2str(interArrivalModes','%2.2f'));
+set(gca,'yTickLabel',num2str(serviceTimeMeans','%2.2f'));
+
+
+subplot(2,2,2)
+imagesc(medianMatrix)
+title('Median for queue time')
+ylabel('Service time mean')
+xlabel('Inter arrival mode')
+colorbar
+caxis([0,18])
 set(gca,'Fontsize',12)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
