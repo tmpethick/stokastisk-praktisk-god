@@ -13,6 +13,7 @@ N.maxT              = 60*14*12;
 N.burnInPeriod      = 60*14;
 N.breakThresholds   = [0.7 1];
 N.isBreakPossible   = false;
+N.printProgress     = true;
 
 arrivalIntensity            = 1;
 meanServiceTimeFewItems     = 8;
@@ -72,5 +73,5 @@ end
 ExProbCusMustQueue = mean(ExProbCusMustQueue);
 %%
 % check if Little's law is satisfied
-lambda = O.customerCounts(1)/sum(cell2mat(O.responseTimes(1)));
+lambda = O.customerThroughPut(1)/mean(cell2mat(O.responseTimes(1)));
 % must find mean customers in system 
