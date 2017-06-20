@@ -1,7 +1,7 @@
 %% This driver experiments with the vanilla model - with a single customer type and without server breaks
 % The following parameters should not be modified in this driver
 N = struct();
-N.isBreakPossible   = true;
+N.isBreakPossible   = false;
 N.probManyItems     = 0;
 
 
@@ -10,7 +10,7 @@ N.maxPreSpace       = 50000;
 
 % maxServers does not matter in this driver, since isBreakPossible = false.
 % Just ensure that maxServers is larger than initialServers
-N.initialServers    = 1;
+N.initialServers    = 2;
 N.maxServers        = 10;
 % Set commonqueue to for a single common queue. Set to 0 for many queues, 
 % i.e. one queue for each server
@@ -18,9 +18,9 @@ N.isCommonQueue     = 1;
 N.maxQueueLength    = 5;
 % Adjust max queue size such that common queue and no common queue
 % scenarios are comparable
-if N.isCommonQueue
-    N.maxQueueLength = N.maxQueueLength*N.maxServers;
-end
+% if N.isCommonQueue
+%     N.maxQueueLength = N.maxQueueLength*N.maxServers;
+% end
 N.numExperiments    = 500;
 N.maxT              = 60*14;
 N.burnInPeriod      = 0;

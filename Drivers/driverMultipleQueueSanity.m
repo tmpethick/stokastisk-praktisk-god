@@ -40,8 +40,8 @@ for i=1:11
     O = main(D, N);
     queueTimes(i)       = mean(O.queueTimes{1});
     serviceTimes(i)     = mean(O.serviceTimes{1});
-    blockedCounts(i)    = O.blockedCounts(1);
-    serverEfficiency(i) = mean(O.serversOccupiedTimes(1,:)/N.maxT);
+    blockedCounts(i)    = O.blockedCounts(1) / O.customerCounts(1);
+    serverEfficiency(i) = mean(O.serversOccupiedTimes(1,:)/(N.maxT - N.burnInPeriod));
     Os{i} = O;
     
     disp(blockedCounts(i))
@@ -71,8 +71,9 @@ xlabel('Number of servers')
 h(3) = subplot(2,2,3);
 bar(5:15, blockedCounts, 'FaceColor', orange)
 set(gca,'fontsize',16)
-ylabel('Blocked Customers')
+ylabel('Blocking Fraction')
 xlabel('Number of servers')
+ylim([0,1])
 % pos = get(h,'Position');
 % new = mean(cellfun(@(v)v(1),pos(1:2)));
 % set(h(3),'Position',[new,pos{end}(2:end)])
@@ -80,7 +81,8 @@ h(4) = subplot(2,2,4);
 bar(5:15,serverEfficiency, 'FaceColor', purple)
 set(gca,'fontsize',16)
 xlabel('Number of servers')
-ylabel('Occupied time / total time')
+ylim([0,1.03])
+ylabel('Work load')
 
 
 %% Validation
