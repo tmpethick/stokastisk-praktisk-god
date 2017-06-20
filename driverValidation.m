@@ -1,9 +1,9 @@
 %% Set parameters
 N = struct();
 N.maxPreSpace       = 100000;
-N.maxQueueLength    = 0;
-N.initialServers    = 10;
-N.maxServers        = 10;
+N.maxQueueLength    = 10;
+N.initialServers    = 1;
+N.maxServers        = 1;
 %Set commonQueue to 1 for a single common queue. Set to 0 for many queues, 
 % i.e. one queue for each server
 N.isCommonQueue     = 1;
@@ -16,7 +16,7 @@ N.isBreakPossible   = false;
 N.printProgress     = true;
 
 arrivalIntensity            = 1;
-meanServiceTimeFewItems     = 8;
+meanServiceTimeFewItems     = 1.1;
 meanServiceTimeManyItems    = 8;
 
 D               = struct();
