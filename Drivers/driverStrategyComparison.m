@@ -21,7 +21,7 @@ N.maxQueueLength    = 5;
 if N.isCommonQueue
     N.maxQueueLength = N.maxQueueLength*N.maxServers;
 end
-N.numExperiments    = 500;
+N.numExperiments    = 5000;
 N.maxT              = 60*14;
 N.burnInPeriod      = 0;
 N.breakThresholds   = [0.7 1];
@@ -38,10 +38,8 @@ rng(1);
 
 %% Call main function
 numExperimentGridPoints = 1;
-%serviceTimeModes = linspace(1.5*0.7,1.5*1.3,numExperimentGridPoints);
-%interArrivalMeans = linspace(1.4*0.7, 1.4*1.3, numExperimentGridPoints);
 serviceTimeModes = 1.5;
-interArrivalMean = 1.4;
+interArrivalMeans = 1.4;
 
 serviceTimeStats = cell(numExperimentGridPoints);
 queueTimeStats = cell(numExperimentGridPoints);
@@ -75,7 +73,7 @@ end
 %%
 clear i j D O N
 c = clock;
-save(sprintf('Drivers/driverVanillaData/driverVanillaExp-%d-%d-%d-%d-%d',c(1),c(2),c(3),c(4),c(5)))
+save(sprintf('Drivers/driverVanillaData/multipleQueueTest-%d-%d-%d-%d-%d',c(1),c(2),c(3),c(4),c(5)))
 %% Plot mean, standard deviation, median and blocking fraction 
 meanMatrix = NaN(numExperimentGridPoints);
 stdMatrix = NaN(numExperimentGridPoints);
@@ -83,7 +81,7 @@ medianMatrix = NaN(numExperimentGridPoints);
 eventCountMatrix = NaN(numExperimentGridPoints);
 for i = 1:numExperimentGridPoints
     for j = 1:numExperimentGridPoints
-        meanMatrix(i,j) = mean(waitTimeStats{i,j}.meanVec);
+        meanMatrix(i,j) = mean(queueTimeStats{i,j}.meanVec);
         stdMatrix(i,j) = mean(sqrt(queueTimeStats{i,j}.varVec));
         medianMatrix(i,j) = mean(queueTimeStats{i,j}.medianVec);
         eventCountMatrix(i,j) = mean(DONStruct{i,j}.O.blockedCounts./(DONStruct{i,j}.O.customerCounts));
