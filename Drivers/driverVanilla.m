@@ -14,7 +14,7 @@ N.initialServers    = 2;
 N.maxServers        = 2;
 % Set commonqueue to for a single common queue. Set to 0 for many queues, 
 % i.e. one queue for each server
-N.isCommonQueue     = 1;
+N.isCommonQueue     = 0;
 N.maxQueueLength    = 5;
 % Adjust max queue size such that common queue and no common queue
 % scenarios are comparable
@@ -37,7 +37,7 @@ D.arrivalDist   = @() PertDist(0.017,1.5,10,[],1);     % mean inter arrival time
 rng(1);
 
 %% Call main function
-numExperimentGridPoints = 1;
+numExperimentGridPoints = 10;
 serviceTimeMeans = linspace(0.65*0.7,0.65*1.3,numExperimentGridPoints);
 interArrivalModes = linspace(0.3*0.7, 0.3*1.3, numExperimentGridPoints);
 
@@ -48,7 +48,7 @@ DONStruct = cell(numExperimentGridPoints);
 for i = 1:length(serviceTimeMeans)
     for j = 1:length(interArrivalModes)
         fprintf('i,j: %d, %d\n',i,j)
-        D.fewItemsDist  = @() lognrnd(serviceTimesMeans,0.3);
+        D.fewItemsDist  = @() lognrnd(serviceTimeMeans(i),0.3);
         D.arrivalDist   = @() PertDist(1/60,interArrivalModes(j),5,[],1);
         % Run experiment
         O = main(D, N);
@@ -96,7 +96,6 @@ title('Mean queue time')
 ylabel('Service time mean')
 xlabel('Inter arrival mode')
 colorbar
-caxis([0,18])
 set(gca,'Fontsize',12)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
@@ -110,7 +109,6 @@ title('Median for queue time')
 ylabel('Service time mean')
 xlabel('Inter arrival mode')
 colorbar
-caxis([0,18])
 set(gca,'Fontsize',12)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
@@ -153,7 +151,7 @@ set(gca,'yTickLabel',num2str(serviceTimeMeans','%2.2f'));
 
 for i = 1:length(serviceTimeMeans)
     for j = 1:length(interArrivalModes)
-        for k = 1:N.numExperiments
+        for k = 1:(DONStruct{i,j}.N.numExperiments)
             DONStruct{i,j}.O.queueTimesw0{k} = DONStruct{i,j}.O.queueTimes{k}(DONStruct{i,j}.O.queueTimes{k}~=0);
         end
         queueTimeStats{i,j}.meanVecw0 = cellfun(@mean, DONStruct{i,j}.O.queueTimesw0);
