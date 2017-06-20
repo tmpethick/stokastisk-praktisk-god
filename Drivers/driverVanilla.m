@@ -28,9 +28,9 @@ N.breakThresholds   = [0.7 1];
 N.printProgress     = false;
 
 D               = struct();
-D.fewItemsDist  = @() PertDist(1/4,1.5,12,[],1);        % mean service time for self-service
+D.fewItemsDist  = @() PertDist(1/4,1.5,12,[],1,10);        % mean service time for self-service
 D.manyItemsDist = @() exprnd(1);        % mean service time for normal service
-D.arrivalDist   = @() exprnd(2.7);     % mean inter arrival time
+D.arrivalDist   = @() exprnd(1.4);     % mean inter arrival time
 % serviceDist = @() 1;                  % constant
 % serviceDist = @() 1*rand^(-1/2.05);   % pareto beta=1, k=2.05
 
@@ -73,7 +73,7 @@ end
 %%
 clear i j D O N
 c = clock;
-save(sprintf('Drivers/driverVanillaExp-%d-%d-%d-%d-%d-%d',c(1),c(2),c(3),c(4),c(5),c(6)))
+save(sprintf('Drivers/driverVanillaData/driverVanillaExp-%d-%d-%d-%d-%d-%d',c(1),c(2),c(3),c(4),c(5)))
 %% Plot mean, standard deviation, median and blocking fraction 
 meanMatrix = NaN(numExperimentGridPoints);
 stdMatrix = NaN(numExperimentGridPoints);
@@ -205,11 +205,11 @@ for i = 1:numExperimentGridPoints
         for k = 1:length(DONStruct{i,j}.O.queueTimes)
             %tempQueueTimes = DONStruct{i,j}.O.queueTimes{k}';
             %tempQueueTimes = tempQueueTimes(tempQueueTimes~=0);
-            combinedWaitTimes = [combinedWaitTimes, DONStruct{i,j}.O.queueTimes{k}];%+DONStruct{i,j}.O.serviceTimes{k}];
+            combinedWaitTimes = [combinedWaitTimes, DONStruct{i,j}.O.queueTimes{k}+DONStruct{i,j}.O.serviceTimes{k}];
         end
-        subplot(10,10,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
-        %histogram(combinedWaitTimes,'Normalization','pdf')
-        plot(sort(combinedWaitTimes),(1:length(combinedWaitTimes))/length(combinedWaitTimes)) 
+        subplot(numExperimentGridPoints,numExperimentGridPoints,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
+        histogram(combinedWaitTimes,'Normalization','pdf')
+        %plot(sort(combinedWaitTimes),(1:length(combinedWaitTimes))/length(combinedWaitTimes)) 
         xlim([0 20])
     end
 end
@@ -217,7 +217,7 @@ end
 %% Server Efficiency plot
 for i = 1:numExperimentGridPoints
     for j = 1:numExperimentGridPoints
-        subplot(10,10,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
+        subplot(numExperimentGridPoints,numExperimentGridPoints,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
         bar(mean(DONStruct{i,j}.O.serversOccupiedTimes)/DONStruct{i,j}.N.maxT)
     end
 end
