@@ -14,7 +14,7 @@ N.initialServers    = 2;
 N.maxServers        = 2;
 % Set commonqueue to for a single common queue. Set to 0 for many queues, 
 % i.e. one queue for each server
-N.isCommonQueue     = 0;
+N.isCommonQueue     = 1;
 N.maxQueueLength    = 5;
 % Adjust max queue size such that common queue and no common queue
 % scenarios are comparable
@@ -29,7 +29,7 @@ N.printProgress     = true;
 
 D               = struct();
 D.fewItemsDist  = @() PertDist(1/4,1.5,12,[],1,10);        % mean service time for self-service
-D.manyItemsDist = @() exprnd(1);        % mean service time for normal service
+D.manyItemsDist = @() PertDist(1/4,1.5,12,[],1,10);        % mean service time for normal service
 D.arrivalDist   = @() exprnd(1.4);     % mean inter arrival time
 % serviceDist = @() 1;                  % constant
 % serviceDist = @() 1*rand^(-1/2.05);   % pareto beta=1, k=2.05
@@ -89,7 +89,6 @@ for i = 1:numExperimentGridPoints
         eventCountMatrix(i,j) = mean(DONStruct{i,j}.O.blockedCounts./(DONStruct{i,j}.O.customerCounts));
     end
 end
-
 
 figure;
 imagesc(meanMatrix)
@@ -200,6 +199,32 @@ set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
 set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 
+%% Difference for inter-arrival means
+
+for i = 1:numExperimentGridPoints
+    plot(interArrivalMeans-interArrivalMeans(ceil(numExperimentGridPoints/2)),meanMatrix(i,:),'*-')
+    hold on
+end
+xlabel('Inter arrival mean')
+ylabel('queue time')
+%% Difference for service time modes
+for i = 1:numExperimentGridPoints
+   plot(serviceTimeModes-serviceTimeModes(ceil(numExperimentGridPoints/2)),meanMatrix(:,i),'*-')
+   hold on 
+end
+xlabel('Service time mode')
+ylabel('queue time')
+%%
+imagesc(cols)
+colorbar;
+title('Median for queue time')
+ylabel('Service time mode') 
+xlabel('Inter arrival time mean') 
+set(gca,'Fontsize',12)
+set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
+set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 %% Histogram of queue times
 for i = 1:numExperimentGridPoints
     for j = 1:numExperimentGridPoints
@@ -218,6 +243,8 @@ for i = 1:numExperimentGridPoints
 end
 
 %% Server Efficiency plot
+
+serverEfficiencyMatrix = zeros(numExperimentGridPoints);
 for i = 1:numExperimentGridPoints
     for j = 1:numExperimentGridPoints
         subplot(numExperimentGridPoints,numExperimentGridPoints,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
@@ -225,5 +252,18 @@ for i = 1:numExperimentGridPoints
         ylim([0,1])
         xlabel('Server index')
         ylabel('Server efficiency')
+
+        meanvec = mean(DONStruct{i,j}.O.serversOccupiedTimes/DONStruct{i,j}.N.maxT);
+        if abs(meanvec(1) - meanvec(2)) > 0.02 % Difference larger than 2%
+            disp(i)
+            disp(j)
+            disp(meanvec(1) - meanvec(2))
+        end
+        %subplot(10,10,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
+        %bar(mean(DONStruct{i,j}.O.serversOccupiedTimes)/DONStruct{i,j}.N.maxT)
+        serverEfficiencyMatrix(i,j) = (mean(meanvec));
     end
 end
+imagesc(serverEfficiencyMatrix)
+colorbar;
+title('Server efficiency plot')
