@@ -112,8 +112,3 @@ ExProbCusMustQueue = mean(ExProbCusMustQueue);
 %%
 % check if Little's law is satisfied
 lambda = O.customersInSystem(1)/mean(cell2mat(O.responseTimes(1)));
-
-
-%%
-[p0, pB, pC] = ErlangCFiniteQueue(arrivalIntensity,meanServiceTimeFewItems,...
-                                    N.maxServers,N.maxQueueLength);
