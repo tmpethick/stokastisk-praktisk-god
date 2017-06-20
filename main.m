@@ -21,6 +21,7 @@ customerCounts = zeros(N.numExperiments,1);
 queueTimes = cell(N.numExperiments,1);
 serviceTimes = cell(N.numExperiments,1);
 responseTimes = cell(N.numExperiments,1);
+customersAtTime = cell(N.numExperiments,1);
 customersInSystem = zeros(N.numExperiments,1);
 O.BreakOnTime = [];
 O.BreakOffTime = [];
@@ -44,14 +45,8 @@ for i=1:(N.numExperiments)
         if nextEvent.timeStamp > N.burnInPeriod
             customersInSystem(i) = customersInSystem(i) +...
                                     currentCustomersInSystem * timeDiff;
-        end
-        
-        switch nextEvent.type
-            case 'Arrival'
-                currentCustomersInSystem = currentCustomersInSystem + 1;
-            case 'Depature'
-                currentCustomersInSystem = currentCustomersInSystem - 1;
-        end    
+            customersAtTime{i} = [customersAtTime{i} currentCustomersInSystem * timeDiff];
+        end 
         
         if countStabilizer > 20 && N.maxQueueLength ~= 0 && N.isBreakPossible
             countStabilizer = 0;
@@ -71,6 +66,10 @@ for i=1:(N.numExperiments)
                 [lists,block] = arrive(lists, D, nextEvent.timeStamp,...
                     N.maxQueueLength, N.probManyItems);
                 
+                if ~block
+                    currentCustomersInSystem = currentCustomersInSystem + 1;
+                end
+
                 %Gathering statistical data
                 if nextEvent.timeStamp > N.burnInPeriod
                     customerCounts(i) = customerCounts(i) + 1;
@@ -81,6 +80,8 @@ for i=1:(N.numExperiments)
             case 'Departure'
                 [lists,queueTime] = depart(lists, nextEvent, D, nextEvent.timeStamp);
                 
+                currentCustomersInSystem = currentCustomersInSystem - 1;
+
                 if nextEvent.timeStamp > N.burnInPeriod
                     
                     %Gathering statistical data (queue times and occupied times
@@ -130,5 +131,5 @@ O.serversOccupiedTimes  = serversOccupiedTimes;
 O.responseTimes         = responseTimes;
 O.serviceTimes          = serviceTimes;
 O.customersInSystem     = customersInSystem;
-
+O.customersAtTime       = customersAtTime;
 end
