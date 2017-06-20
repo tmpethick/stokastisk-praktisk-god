@@ -6,9 +6,9 @@ N.initialServers    = 10;
 N.maxServers        = 10;
 %Set commonQueue to 1 for a single common queue. Set to 0 for many queues, 
 % i.e. one queue for each server
-N.isCommonQueue     = 1;
+N.isCommonQueue     = 0;
 N.probManyItems     = 0;
-N.numExperiments    = 10;
+N.numExperiments    = 1;
 N.maxT              = 60*14*12;
 N.burnInPeriod      = 60*14;
 N.breakThresholds   = [0.7 1];
@@ -29,27 +29,49 @@ D.arrivalDist   = @() exprnd(arrivalIntensity );
 rng(1);
 
 %% Call main function
-O = main(D, N);
+queueTimes = zeros(11,1);
+serviceTimes = zeros(11,1);
+blockedCounts = zeros(11,1);
+Os = cell(11,1);
+for i=1:11
+    N.initialServers    = i + 4;
+    N.maxServers        = i + 4;
+    O = main(D, N);
+    queueTimes(i)       = mean(O.queueTimes{1});
+    serviceTimes(i)     = mean(O.serviceTimes{1});
+    blockedCounts(i)    = O.blockedCounts(1);
+    Os{i} = O;
+    
+    disp(blockedCounts(i))
+    disp(queueTimes(i))
+    disp(serviceTimes(i))
+end
 
-%% Print and plot output
-% Print blocking fractions for all experiments and mean blocking fraction
-disp((O.blockedCounts./O.customerCounts)')
-disp(' ')
-disp(mean(O.blockedCounts./O.customerCounts))
+%% Plot
 
-subplot(1,2,1)
-histogram(O.queueTimes{1}(O.queueTimes{1} ~= 0))
-title('Histogram of queue times')
-xlabel('Queue time (minutes)')
-ylabel('Frequency')
-set(gca,'Fontsize',14)
-subplot(1,2,2)
-bar(O.serversOccupiedTimes(1,:)/N.maxT)
-title('Bar plot of "server efficiency"')
-ylim([0 1])
-xlabel('Server index')
-ylabel('Occupied time / total time')
-set(gca,'Fontsize',14)
+figure
+blue        = [161/255 202/255 241/255];
+red         = [250/255 128/255 114/255];
+green       = [0   1   0.1];
+orange      = [1   0.7 0.4];
+h(1) = subplot(2,2,1);
+bar(5:15, queueTimes, 'FaceColor', blue)
+set(gca,'fontsize',16)
+ylabel('Queue Time')
+xlabel('number of servers')
+h(2) = subplot(2,2,2);
+bar(5:15, serviceTimes, 'FaceColor', red)
+set(gca,'fontsize',16)
+ylabel('Service Time')
+xlabel('number of servers')
+h(3) = subplot(2,2,3);
+bar(5:15, blockedCounts, 'FaceColor', orange)
+set(gca,'fontsize',16)
+ylabel('Blocked Customers')
+xlabel('number of servers')
+pos = get(h,'Position');
+new = mean(cellfun(@(v)v(1),pos(1:2)));
+set(h(3),'Position',[new,pos{end}(2:end)])
 
 %% Validation
 % analytical solution for blocking fraction with no queue, 
