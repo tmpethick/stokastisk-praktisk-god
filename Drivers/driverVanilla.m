@@ -232,9 +232,11 @@ for i = 1:numExperimentGridPoints
         for k = 1:length(DONStruct{i,j}.O.queueTimes)
             %tempQueueTimes = DONStruct{i,j}.O.queueTimes{k}';
             %tempQueueTimes = tempQueueTimes(tempQueueTimes~=0);
-            combinedWaitTimes = [combinedWaitTimes, DONStruct{i,j}.O.queueTimes{k}];%+DONStruct{i,j}.O.serviceTimes{k}];
+            combinedWaitTimes = [combinedWaitTimes, DONStruct{i,j}.O.queueTimes{k}+DONStruct{i,j}.O.serviceTimes{k}];
         end
         subplot(numExperimentGridPoints,numExperimentGridPoints,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
+        histogram(combinedWaitTimes,'Normalization','pdf')
+        %plot(sort(combinedWaitTimes),(1:length(combinedWaitTimes))/length(combinedWaitTimes)) 
         %histogram(combinedWaitTimes,'Normalization','pdf')
         plot(sort(combinedWaitTimes),(1:length(combinedWaitTimes))/length(combinedWaitTimes)) 
         xlim([0 20])
