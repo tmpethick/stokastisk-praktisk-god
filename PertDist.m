@@ -1,4 +1,4 @@
-function [X] = PertDist(min,mode,max,Z,n)
+function [X] = PertDist(min,mode,max,Z,n,gamma)
 % Purpose: Generate a pert distribution based on input.
 % Author(s): Frederik Winkel Lehn
 %% INPUT PARAMETERS
@@ -6,18 +6,23 @@ function [X] = PertDist(min,mode,max,Z,n)
 % mode : Peak of the distribution
 % max : Maximum-value of the distribution
 % Z : A Z(n,1) vector of uniform random variables
-% n : Number of generated numbers, the higher the preciser
+% n : Number of generated numbers, the higher the number the higher the precision
+% gamma : Parameter for weight on the mode, the higher the value the narrower the distribution
 %% Ascertaining input arguments
+generate_in_function = true;
+
 if ~isempty(Z)
     generate_in_function = false;
     n=numel(Z);
-elseif nargin == 5 && isempty(Z)
-    generate_in_function = true;
+end
+
+if nargin < 6
+    gamma = 4; %default Pert parameter
 end
 
 %defining known parameters and preallocating
-alpha1 = 1+4*((mode-min)/(max-min));
-alpha2 = 1+4*((max-mode)/(max-min));
+alpha1 = 1+gamma*((mode-min)/(max-min));
+alpha2 = 1+gamma*((max-mode)/(max-min));
 X = zeros(n,1);
 
 %% Generating the distribution if uniform values are given
