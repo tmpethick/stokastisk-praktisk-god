@@ -14,7 +14,7 @@ N.initialServers    = 2;
 N.maxServers        = 2;
 % Set commonqueue to for a single common queue. Set to 0 for many queues, 
 % i.e. one queue for each server
-N.isCommonQueue     = 0;
+N.isCommonQueue     = 1;
 N.maxQueueLength    = 5;
 % Adjust max queue size such that common queue and no common queue
 % scenarios are comparable
@@ -28,9 +28,9 @@ N.breakThresholds   = [0.7 1];
 N.printProgress     = false;
 
 D               = struct();
-D.fewItemsDist  = @() PertDist(1/4,1.5,12,[],1);        % mean service time for self-service
-D.manyItemsDist = @() exprnd(1);        % mean service time for normal service
-D.arrivalDist   = @() exprnd(2.7);     % mean inter arrival time
+D.fewItemsDist  = @() PertDist(1/4,1.5,12,[],1,10);        % mean service time for self-service
+D.manyItemsDist = @() PertDist(1/4,1.5,12,[],1,10);        % mean service time for normal service
+D.arrivalDist   = @() exprnd(1.4);     % mean inter arrival time
 % serviceDist = @() 1;                  % constant
 % serviceDist = @() 1*rand^(-1/2.05);   % pareto beta=1, k=2.05
 
@@ -73,7 +73,7 @@ end
 %%
 clear i j D O N
 c = clock;
-save(sprintf('Drivers/driverVanillaExp-%d-%d-%d-%d-%d-%d',c(1),c(2),c(3),c(4),c(5),c(6)))
+save(sprintf('Drivers/driverVanillaData/driverVanillaExp-%d-%d-%d-%d-%d',c(1),c(2),c(3),c(4),c(5)))
 %% Plot mean, standard deviation, median and blocking fraction 
 meanMatrix = NaN(numExperimentGridPoints);
 stdMatrix = NaN(numExperimentGridPoints);
@@ -87,7 +87,6 @@ for i = 1:numExperimentGridPoints
         eventCountMatrix(i,j) = mean(DONStruct{i,j}.O.blockedCounts./(DONStruct{i,j}.O.customerCounts));
     end
 end
-
 
 figure;
 imagesc(meanMatrix)
@@ -198,6 +197,32 @@ set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
 set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 
+%% Difference for inter-arrival means
+
+for i = 1:numExperimentGridPoints
+    plot(interArrivalMeans-interArrivalMeans(ceil(numExperimentGridPoints/2)),meanMatrix(i,:),'*-')
+    hold on
+end
+xlabel('Inter arrival mean')
+ylabel('queue time')
+%% Difference for service time modes
+for i = 1:numExperimentGridPoints
+   plot(serviceTimeModes-serviceTimeModes(ceil(numExperimentGridPoints/2)),meanMatrix(:,i),'*-')
+   hold on 
+end
+xlabel('Service time mode')
+ylabel('queue time')
+%%
+imagesc(cols)
+colorbar;
+title('Median for queue time')
+ylabel('Service time mode') 
+xlabel('Inter arrival time mean') 
+set(gca,'Fontsize',12)
+set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
+set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 %% Histogram of queue times
 for i = 1:numExperimentGridPoints
     for j = 1:numExperimentGridPoints
@@ -207,7 +232,7 @@ for i = 1:numExperimentGridPoints
             %tempQueueTimes = tempQueueTimes(tempQueueTimes~=0);
             combinedWaitTimes = [combinedWaitTimes, DONStruct{i,j}.O.queueTimes{k}];%+DONStruct{i,j}.O.serviceTimes{k}];
         end
-        subplot(10,10,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
+        subplot(numExperimentGridPoints,numExperimentGridPoints,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
         %histogram(combinedWaitTimes,'Normalization','pdf')
         plot(sort(combinedWaitTimes),(1:length(combinedWaitTimes))/length(combinedWaitTimes)) 
         xlim([0 20])
@@ -215,9 +240,21 @@ for i = 1:numExperimentGridPoints
 end
 
 %% Server Efficiency plot
+
+serverEfficiencyMatrix = zeros(numExperimentGridPoints);
 for i = 1:numExperimentGridPoints
     for j = 1:numExperimentGridPoints
-        subplot(10,10,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
-        bar(mean(DONStruct{i,j}.O.serversOccupiedTimes)/DONStruct{i,j}.N.maxT)
+        meanvec = mean(DONStruct{i,j}.O.serversOccupiedTimes/DONStruct{i,j}.N.maxT);
+        if abs(meanvec(1) - meanvec(2)) > 0.02 % Difference larger than 2%
+            disp(i)
+            disp(j)
+            disp(meanvec(1) - meanvec(2))
+        end
+        %subplot(10,10,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
+        %bar(mean(DONStruct{i,j}.O.serversOccupiedTimes)/DONStruct{i,j}.N.maxT)
+        serverEfficiencyMatrix(i,j) = (mean(meanvec));
     end
 end
+imagesc(serverEfficiencyMatrix)
+colorbar;
+title('Server efficiency plot')
