@@ -22,7 +22,7 @@ meanServiceTimeManyItems    = 8;
 D               = struct();
 D.fewItemsDist  = @() exprnd(meanServiceTimeFewItems); 
 D.manyItemsDist = @() exprnd(meanServiceTimeManyItems);        
-D.arrivalDist   = @() exprnd(arrivalIntensity );        
+D.arrivalDist   = @() exprnd(arrivalIntensity );
 %D.fewItemsDist  = @() 8;  % constant
 % serviceDist = @() 1*rand^(-1/2.05);   % pareto beta=1, k=2.05
 
@@ -32,6 +32,7 @@ rng(1);
 queueTimes = zeros(11,1);
 serviceTimes = zeros(11,1);
 blockedCounts = zeros(11,1);
+serverEfficiency = zeros(11,1);
 Os = cell(11,1);
 for i=1:11
     N.initialServers    = i + 4;
@@ -40,6 +41,7 @@ for i=1:11
     queueTimes(i)       = mean(O.queueTimes{1});
     serviceTimes(i)     = mean(O.serviceTimes{1});
     blockedCounts(i)    = O.blockedCounts(1);
+    serverEfficiency(i) = mean(O.serversOccupiedTimes(1,:)/N.maxT);
     Os{i} = O;
     
     disp(blockedCounts(i))
@@ -54,24 +56,32 @@ blue        = [161/255 202/255 241/255];
 red         = [250/255 128/255 114/255];
 green       = [0   1   0.1];
 orange      = [1   0.7 0.4];
+purple      = [0.7 0.6 1  ];
+
 h(1) = subplot(2,2,1);
 bar(5:15, queueTimes, 'FaceColor', blue)
 set(gca,'fontsize',16)
 ylabel('Queue Time')
-xlabel('number of servers')
+xlabel('Number of servers')
 h(2) = subplot(2,2,2);
 bar(5:15, serviceTimes, 'FaceColor', red)
 set(gca,'fontsize',16)
 ylabel('Service Time')
-xlabel('number of servers')
+xlabel('Number of servers')
 h(3) = subplot(2,2,3);
 bar(5:15, blockedCounts, 'FaceColor', orange)
 set(gca,'fontsize',16)
 ylabel('Blocked Customers')
-xlabel('number of servers')
-pos = get(h,'Position');
-new = mean(cellfun(@(v)v(1),pos(1:2)));
-set(h(3),'Position',[new,pos{end}(2:end)])
+xlabel('Number of servers')
+% pos = get(h,'Position');
+% new = mean(cellfun(@(v)v(1),pos(1:2)));
+% set(h(3),'Position',[new,pos{end}(2:end)])
+h(4) = subplot(2,2,4);
+bar(5:15,serverEfficiency, 'FaceColor', purple)
+set(gca,'fontsize',16)
+xlabel('Number of servers')
+ylabel('Occupied time / total time')
+
 
 %% Validation
 % analytical solution for blocking fraction with no queue, 
