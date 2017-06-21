@@ -4,7 +4,6 @@ N = struct();
 N.isBreakPossible   = false;
 N.probManyItems     = 0;
 
-
 %% Set parameters
 N.maxPreSpace       = 50000;
 

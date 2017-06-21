@@ -33,8 +33,8 @@ classdef serverList < handle
 
         % Constructor
         function obj = serverList(numServers)
-            obj.status    = zeros(numServers,1);
-            obj.type      = zeros(numServers,1);
+            obj.status       = zeros(numServers,1);
+            obj.type         = zeros(numServers,1);
             obj.timeOccupied = zeros(numServers,1);
         end
     end
