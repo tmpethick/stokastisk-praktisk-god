@@ -21,7 +21,7 @@ N.maxQueueLength    = 5;
 if N.isCommonQueue
     N.maxQueueLength = N.maxQueueLength*N.maxServers;
 end
-N.numExperiments    = 500;
+N.numExperiments    = 90;
 N.maxT              = 60*14;
 N.burnInPeriod      = 0;
 N.breakThresholds   = [0.7 1];
@@ -34,7 +34,7 @@ D.arrivalDist   = @() exprnd(1.4);     % mean inter arrival time
 % serviceDist = @() 1;                  % constant
 % serviceDist = @() 1*rand^(-1/2.05);   % pareto beta=1, k=2.05
 
-rng(1);
+%rng(1);
 
 %% Call main function
 serviceTimeModes = 1.5;

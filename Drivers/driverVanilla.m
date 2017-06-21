@@ -241,16 +241,27 @@ for i = 1:numExperimentGridPoints
             %combinedWaitTimes = [combinedWaitTimes, DONStruct{i,j}.O.queueTimes{k}+DONStruct{i,j}.O.serviceTimes{k}];
             combinedQueueTimes = [combinedQueueTimes, DONStruct{i,j}.O.queueTimes{k}];
         end
-        probabilityLMax(i,j) = sum(combinedQueueTimes>5)/length(combinedQueueTimes);
-        %subplot(numExperimentGridPoints,numExperimentGridPoints,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
-        %histogram(combinedWaitTimes,'Normalization','pdf')
+        %probabilityLMax(i,j) = sum(combinedQueueTimes>5)/length(combinedQueueTimes);
+        subplot(numExperimentGridPoints,numExperimentGridPoints,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
+        histogram(combinedQueueTimes,'Normalization','pdf')
         %plot(sort(combinedWaitTimes),(1:length(combinedWaitTimes))/length(combinedWaitTimes)) 
         %histogram(combinedWaitTimes,'Normalization','pdf')
         %plot(sort(combinedQueueTimes),(1:length(combinedQueueTimes))/length(combinedQueueTimes)) 
-        %xlim([0 20])
+        xlim([0 40])
         %grid on
     end
 end
+ha = axes('Position',[0 0 1 1],'Xlim',[0 1],'Ylim',[0 ... 
+1],'Box','off','Visible','off','Units','normalized', 'clipping' , 'off');
+
+text(0.5, 0.02,'\bf Inter arrival time mean','HorizontalAlignment'... 
+,'center','VerticalAlignment', 'bottom','Fontsize',32)
+
+
+yAxisText = text(0.1, 0.5,'\bf Service time mode','HorizontalAlignment'... 
+,'center','VerticalAlignment', 'bottom','Fontsize',32);
+set(yAxisText, 'rotation', 90)
+%%
 imagesc(probabilityLMax)
 colorbar;
 ylabel('Service time mode') 
