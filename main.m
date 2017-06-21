@@ -5,6 +5,7 @@ function O = main(D, N)
 
 % Adds paths
 addpath('.');
+addpath('./analyticFormulas');
 addpath('./datastructures');
 addpath('./Drivers');
 
@@ -14,17 +15,17 @@ elseif N.maxServers < N.initialServers
     error('maxServers cannot be less than initialServers')
 end
 
-blockedCounts = zeros(N.numExperiments,1);
-eventCounts = zeros(N.numExperiments,1);
+blockedCounts        = zeros(N.numExperiments,1);
+eventCounts          = zeros(N.numExperiments,1);
 serversOccupiedTimes = zeros(N.numExperiments, N.maxServers);
-customerCounts = zeros(N.numExperiments,1);
-queueTimes = cell(N.numExperiments,1);
-serviceTimes = cell(N.numExperiments,1);
-responseTimes = cell(N.numExperiments,1);
-customersAtTime = cell(N.numExperiments,1);
-customersInSystem = zeros(N.numExperiments,1);
-O.BreakOnTime = [];
-O.BreakOffTime = [];
+customerCounts       = zeros(N.numExperiments,1);
+queueTimes           = cell(N.numExperiments,1);
+serviceTimes         = cell(N.numExperiments,1);
+responseTimes        = cell(N.numExperiments,1);
+customersAtTime      = cell(N.numExperiments,1);
+customersInSystem    = zeros(N.numExperiments,1);
+O.BreakOnTime        = [];
+O.BreakOffTime       = [];
 
 for i=1:(N.numExperiments)
     
@@ -116,8 +117,8 @@ for i=1:(N.numExperiments)
     if N.printProgress
         disp(i);
     end
-    lastEvent                = nextEvent;
-    customersInSystem(i)   = customersInSystem(i)/...
+    lastEvent            = nextEvent;
+    customersInSystem(i) = customersInSystem(i)/...
                                 (lastEvent.timeStamp - N.burnInPeriod); 
     
 end
