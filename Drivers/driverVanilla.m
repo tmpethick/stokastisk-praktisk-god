@@ -92,11 +92,10 @@ end
 
 figure;
 imagesc(meanMatrix)
-title('Mean queue time')
+set(gca,'Fontsize',16)
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
 colorbar
-set(gca,'Fontsize',12)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
@@ -105,11 +104,10 @@ set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 
 figure;
 imagesc(stdMatrix)
-title('Standard deviation for queue time')
+set(gca,'Fontsize',16)
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
 colorbar
-set(gca,'Fontsize',12)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
@@ -117,11 +115,10 @@ set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 
 figure;
 imagesc(medianMatrix)
-title('Median for queue time')
+set(gca,'Fontsize',16)
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
 colorbar
-set(gca,'Fontsize',12)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
@@ -129,11 +126,10 @@ set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 
 figure;
 imagesc(eventCountMatrix)
-title('Blocking fraction for one business day')
+set(gca,'Fontsize',16)
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
 colorbar
-set(gca,'Fontsize',12)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
@@ -165,11 +161,10 @@ end
 
 figure;
 imagesc(meanMatrixw0)
-title('Mean queue time')
+set(gca,'Fontsize',16)
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
 colorbar
-set(gca,'Fontsize',12)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
@@ -177,10 +172,10 @@ set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 
 figure;
 imagesc((medianMatrixw0))
+set(gca,'Fontsize',16)
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
 colorbar
-set(gca,'Fontsize',12)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
@@ -188,10 +183,10 @@ set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 
 figure;
 imagesc(stdMatrixw0)
+set(gca,'Fontsize',16)
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
 colorbar
-set(gca,'Fontsize',12)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
@@ -201,34 +196,27 @@ set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 figure;
 for i = 1:numExperimentGridPoints
     plot(interArrivalMeans-interArrivalMeans(ceil(numExperimentGridPoints/2)),meanMatrix(i,:),'o-')
-    legend_names{i} = strcat('Service time mode: ',num2str(serviceTimeModes(i)));
+    legend_names{i} = strcat('Mode: ',num2str(serviceTimeModes(i)));
     hold on 
 end
 hold off
+set(gca,'Fontsize',30)
 legend(legend_names)
 xlabel('\Delta Inter arrival mean')
-ylabel('queue time')
+ylabel('Mean queue time')
+
 %% Difference for service time modes
 figure;
 for i = 1:numExperimentGridPoints
    plot(serviceTimeModes-serviceTimeModes(ceil(numExperimentGridPoints/2)),meanMatrix(:,i),'o-')
-   legend_names{i} = strcat('Inter-arrival time mean: ',num2str(interArrivalMeans(i)));
+   legend_names{i} = strcat('Mean: ',num2str(interArrivalMeans(i)));
    hold on 
 end
 hold off
+set(gca,'Fontsize',30)
 legend(legend_names,'location','northwest')
 xlabel('\Delta Service time mode')
-ylabel('queue time')
-%%
-imagesc(cols)
-colorbar;
-ylabel('Service time mode') 
-xlabel('Inter arrival time mean') 
-set(gca,'Fontsize',12)
-set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
-set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
-set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
-set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
+ylabel('Mean queue time')
 %% Histogram of queue times
 probabilityLMax = zeros(numExperimentGridPoints);
 for i = 1:numExperimentGridPoints
@@ -266,7 +254,7 @@ imagesc(probabilityLMax)
 colorbar;
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
-set(gca,'Fontsize',12)
+set(gca,'Fontsize',16)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
@@ -297,38 +285,27 @@ imagesc(serverEfficiencyMatrix)
 colorbar;
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
-set(gca,'Fontsize',12)
+set(gca,'Fontsize',16)
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
 set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 
-%% Difference between common and not common queue
-
+%% ONLY RUN WHEN COMMON QUEUE DATA IS LOADED
 meanMatrixCommon = meanMatrix;
 stdMatrixCommon = stdMatrix;
 confIntMeanCommon = confIntMean;
-%%
+%% ONLY RUN WHEN NOT COMMON QUEUE DATA IS LOADED
 meanMatrixNotCommon = meanMatrix;
 stdMatrixNotCommon = stdMatrix;
 confIntMeanNotCommon = confIntMean;
-%%
+%% Difference between common and not common queue
 diffMatrix = (meanMatrixCommon-meanMatrixNotCommon)./meanMatrixCommon;
 for i = 1:numExperimentGridPoints
     for j = 1:numExperimentGridPoints
         if confIntMeanCommon(i,j,1) > confIntMeanNotCommon(i,j,2)
-            disp('Significant')
-            i
-            j
-            disp(confIntMeanCommon(i,j,:))
-            disp(confIntMeanNotCommon(i,j,:))
             diffMatrix(i,j) = 1;
         elseif confIntMeanCommon(i,j,2) < confIntMeanNotCommon(i,j,1)
-            i
-            j
-            disp('Significant')
-            disp(confIntMeanCommon(i,j,:))
-            disp(confIntMeanNotCommon(i,j,:))
             diffMatrix(i,j) = -1;
         else
             diffMatrix(i,j) = 0;
@@ -338,6 +315,7 @@ for i = 1:numExperimentGridPoints
 end
 
 imagesc(diffMatrix)
+set(gca,'Fontsize',23)
 colormap(bone)
 hold on 
 plot(1:1,1:1,'black','LineWidth',3)
@@ -345,7 +323,7 @@ plot(1:1,1:1,'color',[0.5 0.5 0.5],'LineWidth',3)
 plot(1:1,1:1,'white','LineWidth',3)
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
-legend({'CQ better','Diff. not significant','NCQ better'},'FontSize',16,'location','southoutside')
+legend({'CQ better','Diff. not significant','NCQ better'},'FontSize',25,'location','southoutside')
 set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));

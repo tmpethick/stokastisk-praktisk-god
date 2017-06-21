@@ -83,34 +83,3 @@ set(gca,'fontsize',16)
 xlabel('Number of servers')
 ylim([0,1.03])
 ylabel('Work load')
-
-
-%% Validation
-% analytical solution for blocking fraction with no queue, 
-% 1 customertype, no breaks, infinite population, 
-% and poisson arrival process
-ThProbOfBlockedCus = ErlangB(arrivalIntensity,meanServiceTimeFewItems,N.maxServers);
-
-% theoretical probability that an arriving customer will need to queue,
-% with inifinte queue, inifinite population, 1 customertype, no breaks,
-% and poisson arrival process
-ThProbCusMustQueue = ErlangC(arrivalIntensity,meanServiceTimeFewItems,N.maxServers);
-
-% theoretical probability of being blocked with finite queue and 
-% 1 server
-thProbBlockedCus1Server = FiniteQueueOneServer(arrivalIntensity,...
-                                meanServiceTimeFewItems,N.maxQueueLength);
-
-% experimental probalibilty that customers are blocked
-ExProbOfBlockedCus = mean(O.blockedCounts)/mean(O.customerCounts);
-
-% experimental probability that customers must queue
-ExProbCusMustQueue = zeros(N.numExperiments,1);
-for i=1:N.numExperiments
-    ExProbCusMustQueue(i) = nnz(cell2mat(O.queueTimes(i)))/O.customerCounts(i);
-end
-ExProbCusMustQueue = mean(ExProbCusMustQueue);
-
-%%
-% check if Little's law is satisfied
-lambda = O.customersInSystem(1)/mean(cell2mat(O.responseTimes(1)));
