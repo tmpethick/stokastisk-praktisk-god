@@ -21,11 +21,11 @@ N.maxQueueLength    = 5;
 if N.isCommonQueue
     N.maxQueueLength = N.maxQueueLength*N.maxServers;
 end
-N.numExperiments    = 500;
+N.numExperiments    = 50;
 N.maxT              = 60*14;
 N.burnInPeriod      = 0;
 N.breakThresholds   = [0.7 1];
-N.printProgress     = true;
+N.printProgress     = false;
 
 D               = struct();
 D.fewItemsDist  = @() PertDist(1/4,1.5,12,[],1,10);        % mean service time for self-service
@@ -37,11 +37,9 @@ D.arrivalDist   = @() exprnd(1.4);     % mean inter arrival time
 rng(1);
 
 %% Call main function
-numExperimentGridPoints = 1;
-%serviceTimeModes = linspace(1.5*0.7,1.5*1.3,numExperimentGridPoints);
-%interArrivalMeans = linspace(1.4*0.7, 1.4*1.3, numExperimentGridPoints);
-serviceTimeModes = 1.5;
-interArrivalMean = 1.4;
+numExperimentGridPoints = 9;
+serviceTimeModes = linspace(1.5*0.7,1.5*1.3,numExperimentGridPoints);
+interArrivalMeans = linspace(1.4*0.7, 1.4*1.3, numExperimentGridPoints);
 
 serviceTimeStats = cell(numExperimentGridPoints);
 queueTimeStats = cell(numExperimentGridPoints);
@@ -78,12 +76,14 @@ c = clock;
 save(sprintf('Drivers/driverVanillaData/driverVanillaExp-%d-%d-%d-%d-%d',c(1),c(2),c(3),c(4),c(5)))
 %% Plot mean, standard deviation, median and blocking fraction 
 meanMatrix = NaN(numExperimentGridPoints);
+confIntMean = NaN(numExperimentGridPoints,numExperimentGridPoints,2);
 stdMatrix = NaN(numExperimentGridPoints);
 medianMatrix = NaN(numExperimentGridPoints);
 eventCountMatrix = NaN(numExperimentGridPoints);
 for i = 1:numExperimentGridPoints
     for j = 1:numExperimentGridPoints
-        meanMatrix(i,j) = mean(waitTimeStats{i,j}.meanVec);
+        meanMatrix(i,j) = mean(queueTimeStats{i,j}.meanVec);
+        confIntMean(i,j,:) = confInt(queueTimeStats{i,j}.meanVec,0.05);
         stdMatrix(i,j) = mean(sqrt(queueTimeStats{i,j}.varVec));
         medianMatrix(i,j) = mean(queueTimeStats{i,j}.medianVec);
         eventCountMatrix(i,j) = mean(DONStruct{i,j}.O.blockedCounts./(DONStruct{i,j}.O.customerCounts));
@@ -177,7 +177,6 @@ set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 
 figure;
 imagesc((medianMatrixw0))
-title('Median for queue time')
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
 colorbar
@@ -189,7 +188,6 @@ set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 
 figure;
 imagesc(stdMatrixw0)
-title('Standard deviation for queue time')
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
 colorbar
@@ -200,24 +198,30 @@ set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
 set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 
 %% Difference for inter-arrival means
-
+figure;
 for i = 1:numExperimentGridPoints
-    plot(interArrivalMeans-interArrivalMeans(ceil(numExperimentGridPoints/2)),meanMatrix(i,:),'*-')
-    hold on
+    plot(interArrivalMeans-interArrivalMeans(ceil(numExperimentGridPoints/2)),meanMatrix(i,:),'o-')
+    legend_names{i} = strcat('Service time mode: ',num2str(serviceTimeModes(i)));
+    hold on 
 end
-xlabel('Inter arrival mean')
+hold off
+legend(legend_names)
+xlabel('\Delta Inter arrival mean')
 ylabel('queue time')
 %% Difference for service time modes
+figure;
 for i = 1:numExperimentGridPoints
-   plot(serviceTimeModes-serviceTimeModes(ceil(numExperimentGridPoints/2)),meanMatrix(:,i),'*-')
+   plot(serviceTimeModes-serviceTimeModes(ceil(numExperimentGridPoints/2)),meanMatrix(:,i),'o-')
+   legend_names{i} = strcat('Inter-arrival time mean: ',num2str(interArrivalMeans(i)));
    hold on 
 end
-xlabel('Service time mode')
+hold off
+legend(legend_names,'location','northwest')
+xlabel('\Delta Service time mode')
 ylabel('queue time')
 %%
 imagesc(cols)
 colorbar;
-title('Median for queue time')
 ylabel('Service time mode') 
 xlabel('Inter arrival time mean') 
 set(gca,'Fontsize',12)
@@ -226,34 +230,46 @@ set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
 set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
 set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 %% Histogram of queue times
+probabilityLMax = zeros(numExperimentGridPoints);
 for i = 1:numExperimentGridPoints
     for j = 1:numExperimentGridPoints
-        combinedWaitTimes = [];
+        %combinedWaitTimes = [];
+        combinedQueueTimes = [];
         for k = 1:length(DONStruct{i,j}.O.queueTimes)
             %tempQueueTimes = DONStruct{i,j}.O.queueTimes{k}';
             %tempQueueTimes = tempQueueTimes(tempQueueTimes~=0);
-            combinedWaitTimes = [combinedWaitTimes, DONStruct{i,j}.O.queueTimes{k}+DONStruct{i,j}.O.serviceTimes{k}];
+            %combinedWaitTimes = [combinedWaitTimes, DONStruct{i,j}.O.queueTimes{k}+DONStruct{i,j}.O.serviceTimes{k}];
+            combinedQueueTimes = [combinedQueueTimes, DONStruct{i,j}.O.queueTimes{k}];
         end
-        subplot(numExperimentGridPoints,numExperimentGridPoints,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
-        histogram(combinedWaitTimes,'Normalization','pdf')
+        probabilityLMax(i,j) = sum(combinedQueueTimes>5)/length(combinedQueueTimes);
+        %subplot(numExperimentGridPoints,numExperimentGridPoints,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
+        %histogram(combinedWaitTimes,'Normalization','pdf')
         %plot(sort(combinedWaitTimes),(1:length(combinedWaitTimes))/length(combinedWaitTimes)) 
         %histogram(combinedWaitTimes,'Normalization','pdf')
-        plot(sort(combinedWaitTimes),(1:length(combinedWaitTimes))/length(combinedWaitTimes)) 
-        xlim([0 20])
-        grid on
+        %plot(sort(combinedQueueTimes),(1:length(combinedQueueTimes))/length(combinedQueueTimes)) 
+        %xlim([0 20])
+        %grid on
     end
 end
-
+imagesc(probabilityLMax)
+colorbar;
+ylabel('Service time mode') 
+xlabel('Inter arrival time mean') 
+set(gca,'Fontsize',12)
+set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
+set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
 %% Server Efficiency plot
 
 serverEfficiencyMatrix = zeros(numExperimentGridPoints);
 for i = 1:numExperimentGridPoints
     for j = 1:numExperimentGridPoints
-        subplot(numExperimentGridPoints,numExperimentGridPoints,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
-        bar(mean(DONStruct{i,j}.O.serversOccupiedTimes)/DONStruct{i,j}.N.maxT)
-        ylim([0,1])
-        xlabel('Server index')
-        ylabel('Server efficiency')
+        %subplot(numExperimentGridPoints,numExperimentGridPoints,sub2ind([numExperimentGridPoints numExperimentGridPoints],j,i))
+        %bar(mean(DONStruct{i,j}.O.serversOccupiedTimes)/DONStruct{i,j}.N.maxT)
+        %ylim([0,1])
+        %xlabel('Server index')
+        %ylabel('Server efficiency')
 
         meanvec = mean(DONStruct{i,j}.O.serversOccupiedTimes/DONStruct{i,j}.N.maxT);
         if abs(meanvec(1) - meanvec(2)) > 0.02 % Difference larger than 2%
@@ -268,4 +284,59 @@ for i = 1:numExperimentGridPoints
 end
 imagesc(serverEfficiencyMatrix)
 colorbar;
-title('Server efficiency plot')
+ylabel('Service time mode') 
+xlabel('Inter arrival time mean') 
+set(gca,'Fontsize',12)
+set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
+set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
+
+%% Difference between common and not common queue
+
+meanMatrixCommon = meanMatrix;
+stdMatrixCommon = stdMatrix;
+confIntMeanCommon = confIntMean;
+%%
+meanMatrixNotCommon = meanMatrix;
+stdMatrixNotCommon = stdMatrix;
+confIntMeanNotCommon = confIntMean;
+%%
+diffMatrix = (meanMatrixCommon-meanMatrixNotCommon)./meanMatrixCommon;
+for i = 1:numExperimentGridPoints
+    for j = 1:numExperimentGridPoints
+        if confIntMeanCommon(i,j,1) > confIntMeanNotCommon(i,j,2)
+            disp('Significant')
+            i
+            j
+            disp(confIntMeanCommon(i,j,:))
+            disp(confIntMeanNotCommon(i,j,:))
+            diffMatrix(i,j) = 1;
+        elseif confIntMeanCommon(i,j,2) < confIntMeanNotCommon(i,j,1)
+            i
+            j
+            disp('Significant')
+            disp(confIntMeanCommon(i,j,:))
+            disp(confIntMeanNotCommon(i,j,:))
+            diffMatrix(i,j) = -1;
+        else
+            diffMatrix(i,j) = 0;
+        end
+    end
+    
+end
+
+imagesc(diffMatrix)
+colormap(bone)
+hold on 
+plot(1:1,1:1,'black','LineWidth',3)
+plot(1:1,1:1,'color',[0.5 0.5 0.5],'LineWidth',3)
+plot(1:1,1:1,'white','LineWidth',3)
+ylabel('Service time mode') 
+xlabel('Inter arrival time mean') 
+legend({'CQ better','Diff. not significant','NCQ better'},'FontSize',16,'location','southoutside')
+set(gca,'xtick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'ytick',linspace(1,numExperimentGridPoints,numExperimentGridPoints));
+set(gca,'XTickLabel',num2str(interArrivalMeans','%2.2f'));
+set(gca,'yTickLabel',num2str(serviceTimeModes','%2.2f'));
+axis image
